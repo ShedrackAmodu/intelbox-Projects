@@ -203,11 +203,4 @@ void loop() {
     digitalWrite(R_en1, 0);
     digitalWrite(L_en1, 0);
   }
-  if(ch2 == failsafe){
-     digitalWrite(R_en, 0);
-    digitalWrite(L_en, 0);
-
-    digitalWrite(R_en1, 0);
-    digitalWrite(L_en1, 0);
-  }
 }
