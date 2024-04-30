@@ -79,6 +79,8 @@ int readChannel(byte channelInput, int minLimit, int maxLimit, int defaultValue)
 
 void loop() {
   // put your main code here, to run repeatedly:
+  int failsafe = 0;
+  failsafe = ch2;
   for (byte i = 0; i < 10; i++) {
     int value = readChannel(i, -100, 100, 0);
     debugSerial.print("Ch");
@@ -133,7 +135,7 @@ void loop() {
     }
   }
   debugSerial.println();
-  delay(10);
+  delay(5);
   speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
   //on or enable switch
   if (ch5 == 100) {
@@ -142,6 +144,7 @@ void loop() {
     digitalWrite(R_en1, 1);
     digitalWrite(L_en1, 1);
     if (ch1 > 20 && ch2 > 20) {
+      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn right fwd
       analogWrite(R_pmw, 0);
       analogWrite(L_pmw, speed);
@@ -150,6 +153,7 @@ void loop() {
       analogWrite(L_pmw1, 0);
     }
     if (ch1 < -20 && ch2 > 20) {
+      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn left fwd
       analogWrite(R_pmw, speed);
       analogWrite(L_pmw, 0);
@@ -158,6 +162,7 @@ void loop() {
       analogWrite(L_pmw1, speed);
     }
     if (ch1 > 20 && ch2 < -20) {
+      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn right bwd
       analogWrite(R_pmw, 0);
       analogWrite(L_pmw, speed);
@@ -166,6 +171,7 @@ void loop() {
       analogWrite(L_pmw1, 0);
     }
     if (ch1 < -20 && ch2 < -20) {
+      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn right bwd
       analogWrite(R_pmw, speed);
       analogWrite(L_pmw, 0);
@@ -173,7 +179,8 @@ void loop() {
       analogWrite(R_pmw1, 0);
       analogWrite(L_pmw1, speed);
     }
-    if (ch1 == 0 && ch2 < -20) {
+    if (ch1 > -20 && ch1 < 20 && ch2 < -20) {
+      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //backward
       analogWrite(R_pmw, 0);
       analogWrite(L_pmw, speed);
@@ -181,16 +188,23 @@ void loop() {
       analogWrite(R_pmw1, 0);
       analogWrite(L_pmw1, speed);
     }
-        if (ch1 == 0 && ch2  > 20) {
+    if (ch1 > -20 && ch1 < 20 && ch2 > 20) {
       //forward
       analogWrite(R_pmw, speed);
       analogWrite(L_pmw, 0);
       //left motor
       analogWrite(R_pmw1, speed);
-      analogWrite(L_pmw1,0);
+      analogWrite(L_pmw1, 0);
     }
   } else {
     digitalWrite(R_en, 0);
+    digitalWrite(L_en, 0);
+
+    digitalWrite(R_en1, 0);
+    digitalWrite(L_en1, 0);
+  }
+  if(ch2 == failsafe){
+     digitalWrite(R_en, 0);
     digitalWrite(L_en, 0);
 
     digitalWrite(R_en1, 0);
