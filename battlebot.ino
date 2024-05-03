@@ -81,7 +81,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   int failsafe = 0;
   failsafe = ch2;
-  for (byte i = 0; i < 10; i++) {
+  for (byte i = 0; i < 8; i++) {
     int value = readChannel(i, -100, 100, 0);
     debugSerial.print("Ch");
     debugSerial.print(i + 1);
@@ -143,7 +143,7 @@ void loop() {
     digitalWrite(L_en, 1);
     digitalWrite(R_en1, 1);
     digitalWrite(L_en1, 1);
-    if (ch1 > 20 && ch2 > 20) {
+    if (ch1 > 40 && (ch2 > 40 || ch2 < -40)) {
       speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn right fwd
       analogWrite(R_pmw, 0);
@@ -152,7 +152,7 @@ void loop() {
       analogWrite(R_pmw1, speed);
       analogWrite(L_pmw1, 0);
     }
-    if (ch1 < -20 && ch2 > 20) {
+    if (ch1 < -40 && (ch2 > 40 || ch2 < -40)) {
       speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn left fwd
       analogWrite(R_pmw, speed);
@@ -161,25 +161,8 @@ void loop() {
       analogWrite(R_pmw1, 0);
       analogWrite(L_pmw1, speed);
     }
-    if (ch1 > 20 && ch2 < -20) {
-      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
-      //turn right bwd
-      analogWrite(R_pmw, 0);
-      analogWrite(L_pmw, speed);
-      //left motor
-      analogWrite(R_pmw1, speed);
-      analogWrite(L_pmw1, 0);
-    }
-    if (ch1 < -20 && ch2 < -20) {
-      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
-      //turn right bwd
-      analogWrite(R_pmw, speed);
-      analogWrite(L_pmw, 0);
-      //left motor
-      analogWrite(R_pmw1, 0);
-      analogWrite(L_pmw1, speed);
-    }
-    if (ch1 > -20 && ch1 < 20 && ch2 < -20) {
+  
+    if (ch1 > -20 && ch1 < 20 && ch2 < 0) {
       speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //backward
       analogWrite(R_pmw, 0);
@@ -188,7 +171,7 @@ void loop() {
       analogWrite(R_pmw1, 0);
       analogWrite(L_pmw1, speed);
     }
-    if (ch1 > -20 && ch1 < 20 && ch2 > 20) {
+    if (ch1 > -20 && ch1 < 20 && ch2 > 0) {
       //forward
       analogWrite(R_pmw, speed);
       analogWrite(L_pmw, 0);
