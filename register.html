@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistics - IntelStats</title>
+    <title>Register - IntelStats</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -11,8 +11,9 @@
     <header class="main-header">
         <nav class="main-nav">
             <ul>
-                <li><a href="index.html"><h1 class="brand-name">IntelStats</h1></a></li>
-                <li><a href="index.html"><strong class="nav-stats">Statistics</strong></a></li>
+                <li><a href=""><h1 class="brand-name">IntelStats</h1></a></li>
+                <li><a href="index.html"><strong class="nav-stats">Home</strong></a></li>
+                <li><a href="stats.html"><strong class="nav-stats">Statistics</strong></a></li>
                 <li><a href="register.html"><strong class="nav-stats">Register</strong></a></li>
             </ul>
         </nav>
@@ -48,36 +49,6 @@
 <!-- <script type="module" src="js/main.js"></script> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 
-<script>
-    document.getElementById('mForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // prevent form submission
 
-    // Get form values
-    const name = document.getElementById('name').value;
-    const skills = document.getElementById('skills').value;
-
-    // Create an object to store the data
-    let userName = name
-    let skillLevel =skills
-
-    // Get existing data from local storage or initialize an empty array
-    let storedNameData = JSON.parse(localStorage.getItem('userName')) || [];
-    let storedSkillData = JSON.parse(localStorage.getItem('skillLevel')) || [];
-
-    // Push new data to the array
-    storedNameData.push(userName);
-    storedSkillData.push(skillLevel);
-
-    // Store the updated array back to local storage
-    localStorage.setItem('userName', JSON.stringify(storedNameData));
-    localStorage.setItem('skillLevel', JSON.stringify(storedSkillData));
-
-    // (Optional) notify the user that it has been saved
-    alert("Data stored successfully");
-
-    // Redirect to another page
-    window.location.href = 'index.html';
-});
-</script>
 
 </html>

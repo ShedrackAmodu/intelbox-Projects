@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - IntelStats</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .chart {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <!-- <header class="main-header">
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html"><h1 class="brand-name">IntelStats</h1></a></li>
+                <li><a href="index.html"><strong class="nav-stats">Back</strong></a></li>
+            </ul>
+        </nav>
+    </header> -->
+
+    <div class="side-header" hidden>
+        <button class="nav-btn" id="dashboardBtn" type="button">Add Members</button>
+    </div>
+
+    
+    <div class="chart">
+        <div class="hero-section">
+            <p class="brand-name-hero"><strong>Team Members Chart</strong></p>
+            <a href="index.html"><strong class="nav-stats-2     ">Back</strong></a>
+        </div>
+        
+        <div class="chart-section" id="chartSection">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+</body>
+
+<script type="module" src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Retrieve form data from localStorage
+    
+    
+    // // Display form data
+    // const formDataList = document.getElementById('formDataList');
+    // formDataArray.forEach(data => {
+    //   const listItem = document.createElement('li');
+    //   listItem.textContent = `Name: ${data.name}, Email: ${data.email}`;
+    //   formDataList.appendChild(listItem);
+    // });
+    </script>
+
+</html>

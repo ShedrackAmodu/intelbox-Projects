@@ -42,7 +42,7 @@ let myChart = new Chart(ctx, {
   data: {
     labels: storedNameData,
     datasets: [{
-      label: 'Team Members Coding Skills',
+      label: 'Coding Skill Level',
       backgroundColor: barColors,
       data: storedSkillData
     }]

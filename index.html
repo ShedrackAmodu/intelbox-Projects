@@ -3,48 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IntelStats</title>
+    <title>Home - IntelStats</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Navigation Header -->
-    <header class="main-header">
-        <nav class="main-nav">
-            <ul>
-                <li><a href=""><h1 class="brand-name">IntelStats</h1></a></li>
-                <li><a href="index.html"><strong class="nav-stats">Statistics</strong></a></li>
-                <li><a href="register.html"><strong class="nav-stats">Register</strong></a></li>
-            </ul>
-        </nav>
-    </header>
+    <section id="HomePage">
+         <!-- Navigation Header -->
+        <header class="main-header">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href=""><h1 class="brand-name">IntelStats</h1></a></li>
+                    <li><a href="index.html"><strong class="nav-stats">Home</strong></a></li>
+                    <li><a href="#AboutPage"><strong class="nav-stats">About Us</strong></a></li>
+                    <li><a href="#AddMemberPage"><strong class="nav-stats">Add Member</strong></a></li>
+                    <li><a href="stats.html"><strong class="nav-stats">View Statistics</strong></a></li>
+                </ul>
+            </nav>
+        </header>
 
-    <div class="side-header" hidden>
-        <button class="nav-btn" id="dashboardBtn" type="button">Add Members</button>
-    </div>
+        <div class="hGrid">
+            <div class="robImg">
+                <img src="assets/stats-pic-1.svg" alt="Download" class="robImg2 anim-d">
+            </div>
+            <div class="intro anim-d">
+                <!-- <hr class="hr-HP anim-d"> -->
+                <h2 class="h2">
+                    Welcome to <span class="brand-name-hero">IntelStats!</span> Get ready to experience something special. Dive into our content, connect with like-minded individuals, and make the most of your time here.
+                </h2>
+            </div>
+        </div>
+    </section>
 
-    <div class="hero-section">
-        <p class="brand-name-hero"><strong>Welcome to IntelStats!</strong></p>
-    </div>
+    <section id="AboutPage">
+            <div class="Ab_Us">
+                 <h1 class="Ab_Us2 anim-d">About Us</h1>
+            </div>
 
-    <div class="chart-section" id="chartSection">
-        <canvas id="myChart"></canvas>
-    </div>
-</body>
+            <!-- <hr class="hr-AB"> -->
 
-<script type="module" src="js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <div class="AGrid">
+                 <div class="Ab_text">
+                     <p class="Ab_text2 anim-d">At IntelStats, we're passionate about leveraging and cutting-edge technology to drive positive change and empower youths worldwide. Since our inception, we've been on a mission to push the boundaries of what's possible, delivering innovative solutions that solve real-world problems and inspire progress.</p>
+                     <p class="Ab_text3 anim-d">What sets us apart is our relentless commitment to excellence. We combine technical expertise with creativity and strategic thinking to deliver solutions that exceed expectations. Whether it's developing groundbreaking software, designing next-generation hardware, or providing consulting services, we as a team approach every project with enthusiasm and dedication.</p>
+                 </div>
+                 <div class="Ab_img">
+                     <img src="assets/stats-pic-2.svg" alt="Download" class="Ab_img2 anim-d">
+                </div>
+            </div>
+    </section>
 
-<script>
-    // Retrieve form data from localStorage
+    <section id="AddMemberPage">
+            <div class="Amp_Heading">
+                <h1 class="Amp_Heading2 anim-d">Add Member</h1>
+            </div>
+
+            <!-- <hr class="hr-AM"> -->
+
+            <div class="hGrid">
+                <div id="formSection">
+                    <form class="form anim-d" id="mForm">
+                        <p class="title">Register </p>
+                        <p class="message">Please take a few moments to fill out the form below.</p>
+                            <div class="flex">
+                            <label>
+                                <input class="input inp2" type="text" placeholder="" id="name" name="name" required>
+                                <span>Firstname</span>
+                            </label>
+            
+                            <label>
+                                <input class="input" type="number" placeholder="" id="skills" name="skills" required>
+                                <span>SkillLevel</span>
+                            </label>
+                        </div>  
+                        <button class="submit" type="submit"><strong>Submit</strong></button>
+                    </form>
+                </div>
+                <span>
+                    <div class="Ab_img">
+                        <img src="assets/stats-pic-3.svg" alt="Download" class="Ab_img2 anim-d">
+                    </div>
+                </span>
+            </div>
+    </section>
+
+    <section id="ContactPage">
+         <div class="grid-container4">
+             <div class="CP-CustomerService anim-d">
+                 <h2 class="CP-heading">Our Clients</h2>
+                 <!-- <hr> -->
+             </div>
+             <div class="CP-ContactUs anim-d">
+                 <h2 class="CP-heading">Contact Us</h2>
+                 <!-- <hr> -->
+                 <div class="contact-details">
+                    <h4 class="CP-h4"><i class="fa-solid fa-phone"></i><span>:+234-810-834-6153.</span></h4>
+                    <h4 class="CP-h4"><i class="fa-solid fa-location-dot"></i><span>:Plot 1504, Shehu Musa Yar'adua Way, Mabushi Abuja.</span></h4>
+                    <h4 class="CP-h4"><i class="fa-solid fa-envelope"></i><span>:IntelStats@gmail.com.</span></h4>
+                 </div>
+             </div>
+             <div class="CP-getintouch anim-d">
+                 <h2 class="CP-heading">Get In Touch</h2>
+                 <!-- <hr> -->
+                 <form action="" id="form">
+                     <div class="form-group">
+                         <div class="CP-getintouch2">
+                             <label for="fName">Full Name<span>*</span></label>
+                         </div>
+                         <input type="text" class="CP-input" placeholder="Name" id="fName"><br>
+                         <small></small>
+                     </div>           
+                     <div class="form-group">
+                         <div class="CP-getintouch2">
+                             <label for="mail">Email Address<span>*</span></label>
+                         </div>
+                         <input type="text" class="CP-input" placeholder="Email Address" id="mail">
+                         <small></small>
+                     </div>
+                     <div class="CP-getintouch2">
+                         <label for="message">Message Us<span>*</span></label>
+                     </div>
+                     <textarea id="message" name="message" cols="30" rows="10" class="CP-input2"></textarea>
+                     <div class="CP-getintouch2">
+                         <button type="submit" class="CP-btn" id="close">Send Message</button>
+                     </div>
+                 </form> 
+            </div>
+           </div>
+           <div class="CP-hr">
+             <hr>
+           </div>
+             <p class="CR anim-d">© 2024. All rights reserved.</p>
+             <div class="CP-footer anim-d">
+             <a href="#"><i class="fa-solid fa-envelope ico"></i></a>
+             <a href="#"><i class="fa-brands fa-twitter ico"></i></a>
+             <a href="#"><i class="fa-brands fa-instagram ico"></i></a>
+             <a href="#"><i class="fa-brands fa-whatsapp ico"></i></i></a>
+           </div>
+    </section>
+
+    <script>
+        document.getElementById('mForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // prevent form submission
     
+        // Get form values
+        const name = document.getElementById('name').value;
+        const skills = document.getElementById('skills').value;
     
-    // // Display form data
-    // const formDataList = document.getElementById('formDataList');
-    // formDataArray.forEach(data => {
-    //   const listItem = document.createElement('li');
-    //   listItem.textContent = `Name: ${data.name}, Email: ${data.email}`;
-    //   formDataList.appendChild(listItem);
-    // });
+        // Create an object to store the data
+        let userName = name
+        let skillLevel = skills
+    
+        // Get existing data from local storage or initialize an empty array
+        let storedNameData = JSON.parse(localStorage.getItem('userName')) || [];
+        let storedSkillData = JSON.parse(localStorage.getItem('skillLevel')) || [];
+    
+        // Push new data to the array
+        storedNameData.push(userName);
+        storedSkillData.push(skillLevel);
+    
+        // Store the updated array back to local storage
+        localStorage.setItem('userName', JSON.stringify(storedNameData));
+        localStorage.setItem('skillLevel', JSON.stringify(storedSkillData));
+    
+        // (Optional) notify the user that it has been saved
+        alert("Data stored successfully");
+    
+        // Redirect to another page
+        window.location.href = 'stats.html';
+    });
     </script>
-
+</body>
 </html>
