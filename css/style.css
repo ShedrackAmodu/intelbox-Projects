@@ -7,6 +7,23 @@
     text-decoration: none;
 }
 
+:root{
+    --lightColor: #fff;
+    --lightTextColor: #fff;
+    --bgdarkGreenColor: #0a0029;
+    --darkGreenColor: #002529;
+    --darkGreenTextColor: #002529;
+    --lightGreenColor: #003267;
+    --lightGreenTextColor: #004047;
+    --lightBrownColor: #E88C7D;
+    --lightBrownTextColor: #E88C7D;
+    --hoverSubmit: #006aff96;
+    --lightBorderColor: 2px solid #fff;
+    --lightTitleColor: #0091ff;
+    --footerColor: #002529;
+    --blueGreenGrad: linear-gradient(to left, #4284ff 0%, #07e78a 100%);
+} 
+
 .main-header {
     padding-bottom: 50px;
 }
@@ -24,7 +41,7 @@
 
 .main-nav li {
     display: inline;
-    padding: 2rem;
+    padding: 1rem;
     align-items: center;
 }
 
@@ -37,7 +54,7 @@
 .brand-name {
     padding: 1rem;
     font-size: 32px;
-    background-image: linear-gradient(to left, #4284ff 0%, #07e78a 100%);
+    background-image: var(--blueGreenGrad);
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -47,7 +64,7 @@
 .brand-name-hero {
   font-size: 40px;
   text-align: center;
-  background-image: linear-gradient(to left, #4284ff 0%, #07e78a 100%);
+  background-image: var(--blueGreenGrad);
   -webkit-background-clip: text;
   -moz-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -59,7 +76,7 @@
     font-size: 24px;
     border-radius: 5px; 
     top: 0;
-    padding: 0.5rem;
+    padding: 0.3rem;
     text-align: center;
 }
 
@@ -73,7 +90,7 @@
 }
 
 .nav-stats:hover {
-    background-image: linear-gradient(to left, #4284ff 0%, #07e78a 100%);
+    background-image: var(--blueGreenGrad);
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -82,7 +99,7 @@
 }
 
 .nav-stats-2:hover {
-    background-image: linear-gradient(to left, #4284ff 0%, #07e78a 100%);
+    background-image: var(--blueGreenGrad);
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -136,23 +153,6 @@ body{
     overflow-x: hidden;    
 }
 
-:root{
-    --lightColor: #fff;
-    --lightTextColor: #fff;
-    --bgdarkGreenColor: #0a0029;
-    --darkGreenColor: #002529;
-    --darkGreenTextColor: #002529;
-    --lightGreenColor: #003267;
-    --lightGreenTextColor: #004047;
-    --lightBrownColor: #E88C7D;
-    --lightBrownTextColor: #E88C7D;
-    --hoverSubmit: #a200ff96;
-    --lightBorderColor: 2px solid #fff;
-    --lightTitleColor: #d900ff;
-    --footerColor: #002529;
-
-} 
-
 /* NAVBAR */
 #HomePage{
     background-color: var(--bgdarkGreenColor);
@@ -200,8 +200,9 @@ body{
 
 .toggle-switch {
     position: relative;
-    left: 13rem;
-    bottom: 0.5rem;
+    right: 3rem;
+    top: 1.5rem; 
+    float: right;
     width: 100px;
     height: px;
     --light: #d8dbe0;

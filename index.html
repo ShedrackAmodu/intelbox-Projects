@@ -17,16 +17,24 @@
                     <li><a href="#AboutPage"><strong class="nav-stats">About Us</strong></a></li>
                     <li><a href="#AddMemberPage"><strong class="nav-stats">Add Member</strong></a></li>
                     <li><a href="stats.html"><strong class="nav-stats">View Statistics</strong></a></li>
+
+                    <li>
+                        <div class="toggle-switch">
+                            <label class="switch-label">
+                              <input type="checkbox" class="checkbox btnLight">
+                              <span class="slider"></span>
+                            </label>
+                        </div>  
+                    </li>
                 </ul>
             </nav>
         </header>
-
         <div class="hGrid">
             <div class="robImg">
-                <img src="assets/stats-pic-1.svg" alt="Download" class="robImg2 anim-d">
+                <img src="assets/stats-pic-1.svg" alt="Download" class="robImg2 anim">
             </div>
-            <div class="intro anim-d">
-                <!-- <hr class="hr-HP anim-d"> -->
+            <div class="intro anim">
+                <!-- <hr class="hr-HP anim"> -->
                 <h2 class="h2">
                     Welcome to <span class="brand-name-hero">IntelStats!</span> Get ready to experience something special. Dive into our content, connect with like-minded individuals, and make the most of your time here.
                 </h2>
@@ -36,32 +44,32 @@
 
     <section id="AboutPage">
             <div class="Ab_Us">
-                 <h1 class="Ab_Us2 anim-d">About Us</h1>
+                 <h1 class="Ab_Us2 anim">About Us</h1>
             </div>
 
             <!-- <hr class="hr-AB"> -->
 
             <div class="AGrid">
                  <div class="Ab_text">
-                     <p class="Ab_text2 anim-d">At IntelStats, we're passionate about leveraging and cutting-edge technology to drive positive change and empower youths worldwide. Since our inception, we've been on a mission to push the boundaries of what's possible, delivering innovative solutions that solve real-world problems and inspire progress.</p>
-                     <p class="Ab_text3 anim-d">What sets us apart is our relentless commitment to excellence. We combine technical expertise with creativity and strategic thinking to deliver solutions that exceed expectations. Whether it's developing groundbreaking software, designing next-generation hardware, or providing consulting services, we as a team approach every project with enthusiasm and dedication.</p>
+                     <p class="Ab_text2 anim">At IntelStats, we're passionate about leveraging and cutting-edge technology to drive positive change and empower youths worldwide. Since our inception, we've been on a mission to push the boundaries of what's possible, delivering innovative solutions that solve real-world problems and inspire progress.</p>
+                     <p class="Ab_text3 anim">What sets us apart is our relentless commitment to excellence. We combine technical expertise with creativity and strategic thinking to deliver solutions that exceed expectations. Whether it's developing groundbreaking software, designing next-generation hardware, or providing consulting services, we as a team approach every project with enthusiasm and dedication.</p>
                  </div>
                  <div class="Ab_img">
-                     <img src="assets/stats-pic-2.svg" alt="Download" class="Ab_img2 anim-d">
+                     <img src="assets/stats-pic-2.svg" alt="Download" class="Ab_img2 anim">
                 </div>
             </div>
     </section>
 
     <section id="AddMemberPage">
             <div class="Amp_Heading">
-                <h1 class="Amp_Heading2 anim-d">Add Member</h1>
+                <h1 class="Amp_Heading2 anim">Add Member</h1>
             </div>
 
             <!-- <hr class="hr-AM"> -->
 
             <div class="hGrid">
                 <div id="formSection">
-                    <form class="form anim-d" id="mForm">
+                    <form class="form anim" id="mForm">
                         <p class="title">Register </p>
                         <p class="message">Please take a few moments to fill out the form below.</p>
                             <div class="flex">
@@ -80,7 +88,7 @@
                 </div>
                 <span>
                     <div class="Ab_img">
-                        <img src="assets/stats-pic-3.svg" alt="Download" class="Ab_img2 anim-d">
+                        <img src="assets/stats-pic-3.svg" alt="Download" class="Ab_img2 anim">
                     </div>
                 </span>
             </div>
@@ -88,11 +96,11 @@
 
     <section id="ContactPage">
          <div class="grid-container4">
-             <div class="CP-CustomerService anim-d">
+             <div class="CP-CustomerService anim">
                  <h2 class="CP-heading">Our Clients</h2>
                  <!-- <hr> -->
              </div>
-             <div class="CP-ContactUs anim-d">
+             <div class="CP-ContactUs anim">
                  <h2 class="CP-heading">Contact Us</h2>
                  <!-- <hr> -->
                  <div class="contact-details">
@@ -101,7 +109,7 @@
                     <h4 class="CP-h4"><i class="fa-solid fa-envelope"></i><span>:IntelStats@gmail.com.</span></h4>
                  </div>
              </div>
-             <div class="CP-getintouch anim-d">
+             <div class="CP-getintouch anim">
                  <h2 class="CP-heading">Get In Touch</h2>
                  <!-- <hr> -->
                  <form action="" id="form">
@@ -132,8 +140,8 @@
            <div class="CP-hr">
              <hr>
            </div>
-             <p class="CR anim-d">© 2024. All rights reserved.</p>
-             <div class="CP-footer anim-d">
+             <p class="CR anim">© 2024. All rights reserved.</p>
+             <div class="CP-footer anim">
              <a href="#"><i class="fa-solid fa-envelope ico"></i></a>
              <a href="#"><i class="fa-brands fa-twitter ico"></i></a>
              <a href="#"><i class="fa-brands fa-instagram ico"></i></a>
@@ -141,6 +149,7 @@
            </div>
     </section>
 
+    <script src="js/ld-mode.js"></script>
     <script>
         document.getElementById('mForm').addEventListener('submit', function(event) {
         event.preventDefault(); // prevent form submission
@@ -172,5 +181,6 @@
         window.location.href = 'stats.html';
     });
     </script>
+    
 </body>
 </html>

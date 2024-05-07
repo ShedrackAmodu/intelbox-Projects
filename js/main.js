@@ -1,9 +1,14 @@
+
+
+
 // HTML Elements
 const dashboardBtn = document.getElementById('dashboardBtn')
 const chartSection = document.getElementById("chartSection")
 const formSection = document.getElementById("formSection")
+const btnLight = document.querySelector('.btnLight');
 let switched = false
 
+  
 // Chart Values
 let xValues = [];
 
@@ -19,19 +24,6 @@ let barColors = ["aquamarine", "cornflowerblue", "blueviolet"];
 // Chart Canvas
 const ctx = document.getElementById('myChart');
 
-// Switching from chart to form
-dashboardBtn.onclick = function() {
-  if (!switched) {
-    dashboardBtn.innerText = "Dashboard"
-    switched = true
-  }
-  else {
-    dashboardBtn.innerText = "Add Members"
-    switched = false
-  }
-  chartSection.toggleAttribute('hidden')
-  formSection.toggleAttribute('hidden')
-}
 
 let storedNameData = JSON.parse(localStorage.getItem('userName')) || [];
 let storedSkillData = JSON.parse(localStorage.getItem('skillLevel')) || [];
@@ -56,6 +48,20 @@ let myChart = new Chart(ctx, {
   }
 });
 
+btnLight.addEventListener('click', () => {
+  document.body.classList.toggle('light-mode');
+  if (document.body.classList.contains('light-mode')) {
+      localStorage.setItem('theme', 'light-mode');
+  } else{
+      localStorage.removeItem('theme');
+  }
+})
+
+// PROPER IMPLEMENTATION OF THE THEME STORAGE
+const theme = localStorage.getItem('theme');
+if (theme) {
+document.body.classList.add('light-mode');
+}
 
 console.log(storedNameData);
 console.log(storedSkillData);
