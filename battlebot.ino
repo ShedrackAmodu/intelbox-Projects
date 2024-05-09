@@ -189,14 +189,14 @@ void loop() {
       analogWrite(L_pmw1, 0);
 
     }
- 
   }
   else {
     digitalWrite(R_en, 0);
     digitalWrite(L_en, 0);
 
-    //weapon motor
-    analogWrite(motor, 0);
+    //weapon motor stopped
+    analogWrite(motor,0);
+    
     digitalWrite(R_en1, 0);
     digitalWrite(L_en1, 0);
   }
