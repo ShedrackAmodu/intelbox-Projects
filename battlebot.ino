@@ -23,7 +23,7 @@ int forwardenable = 0;
 int backwardenable = 0;
 int speed = 0;
 
-const int motor =9;
+const int motor = 9;
 int ch1 = 0;
 int ch2 = 0;
 int ch3 = 0;
@@ -56,7 +56,7 @@ void setup() {
   pinMode(L_en1, OUTPUT);
   pinMode(L_pmw1, OUTPUT);
 
-  pinMode(motor,INPUT);
+  pinMode(motor, INPUT);
   digitalWrite(R_is, 0);
   digitalWrite(L_is, 0);
   digitalWrite(R_en, 1);
@@ -105,8 +105,8 @@ void loop() {
     if (i == 4) {
       ch5 = value;
     }
-    if (i==8){
-      ch8 =value;
+    if (i == 8) {
+      ch8 = value;
     }
   }
 
@@ -141,6 +141,7 @@ void loop() {
   }
   debugSerial.println();
   delay(5);
+
   speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
   //on or enable switch
   if (ch5 == 100) {
@@ -148,6 +149,9 @@ void loop() {
     digitalWrite(L_en, 1);
     digitalWrite(R_en1, 1);
     digitalWrite(L_en1, 1);
+
+    //weapon motor
+    analogWrite(motor, map(ch8, 0, 100, 0, 255));
     if (ch1 > 40 && (ch2 > 40 || ch2 < -40)) {
       speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn right fwd
@@ -166,7 +170,7 @@ void loop() {
       analogWrite(R_pmw1, 0);
       analogWrite(L_pmw1, speed);
     }
-  
+
     if (ch1 > -20 && ch1 < 20 && ch2 < 0) {
       speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //backward
@@ -183,14 +187,16 @@ void loop() {
       //left motor
       analogWrite(R_pmw1, speed);
       analogWrite(L_pmw1, 0);
-     
+
     }
-    analogWrite(motor,map(ch8,0, 100, 0, 255));
-    
-  } else {
+ 
+  }
+  else {
     digitalWrite(R_en, 0);
     digitalWrite(L_en, 0);
 
+    //weapon motor
+    analogWrite(motor, 0);
     digitalWrite(R_en1, 0);
     digitalWrite(L_en1, 0);
   }
