@@ -12,7 +12,7 @@ const int L_is = 5;
 const int L_en = 6;
 const int L_pmw = 7;
 const int R_is1 = 8;
-const int R_en1 = 9;
+const int R_en1 = 22;
 const int R_pmw1 = 10;
 const int L_is1 = 11;
 const int L_en1 = 12;
@@ -23,6 +23,7 @@ int forwardenable = 0;
 int backwardenable = 0;
 int speed = 0;
 
+const int motor =9;
 int ch1 = 0;
 int ch2 = 0;
 int ch3 = 0;
@@ -55,6 +56,7 @@ void setup() {
   pinMode(L_en1, OUTPUT);
   pinMode(L_pmw1, OUTPUT);
 
+  pinMode(motor,INPUT);
   digitalWrite(R_is, 0);
   digitalWrite(L_is, 0);
   digitalWrite(R_en, 1);
@@ -81,7 +83,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   int failsafe = 0;
   failsafe = ch2;
-  for (byte i = 0; i < 8; i++) {
+  for (byte i = 0; i < 10; i++) {
     int value = readChannel(i, -100, 100, 0);
     debugSerial.print("Ch");
     debugSerial.print(i + 1);
@@ -102,6 +104,9 @@ void loop() {
     }
     if (i == 4) {
       ch5 = value;
+    }
+    if (i==8){
+      ch8 =value;
     }
   }
 
@@ -178,7 +183,10 @@ void loop() {
       //left motor
       analogWrite(R_pmw1, speed);
       analogWrite(L_pmw1, 0);
+     
     }
+    analogWrite(motor,map(ch8,0, 100, 0, 255));
+    
   } else {
     digitalWrite(R_en, 0);
     digitalWrite(L_en, 0);
