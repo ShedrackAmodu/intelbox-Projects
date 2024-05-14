@@ -31,11 +31,8 @@ int ch4 = 0;
 int ch5 = 0;
 int ch6 = 0;
 int ch7 = 0;
-int ch8 = 0;
-int ch9 = 0;
+int ch8 = 0;  
 
-int weightForward = 0;
-int weightBackward = 0;
 void setup() {
   // put your setup code here, to run once:
   debugSerial.begin(74880);
@@ -66,6 +63,8 @@ void setup() {
   digitalWrite(L_is1, 0);
   digitalWrite(R_en1, 1);
   digitalWrite(L_en1, 1);
+
+  delay(2000) // wait for reciever to activate
 }
 
 
@@ -76,14 +75,11 @@ int readChannel(byte channelInput, int minLimit, int maxLimit, int defaultValue)
   if (ch < 100) return defaultValue;
   return map(ch, 1000, 2000, minLimit, maxLimit);
 }
-
-// Red the channel and return a boolean value
-
+  
 void loop() {
   // put your main code here, to run repeatedly:
   int failsafe = 0;
-  failsafe = ch2;
-  for (byte i = 0; i < 10; i++) {
+  for (byte i = 0; i < 7; i++) {
     int value = readChannel(i, -100, 100, 0);
     debugSerial.print("Ch");
     debugSerial.print(i + 1);
@@ -106,39 +102,11 @@ void loop() {
       ch5 = value;
     }
     if (i == 8) {
-      ch8 = value;
+      ch6 = value;
     }
   }
-
-  if (ch1) {
-    //left
-    if (ch1 < 0) {
-      rightenable = 0;
-      leftenable = 1;
-    }
-    //right
-    if (ch1 > 0) {
-      rightenable = 1;
-      leftenable = 0;
-    }
-  }
-
-  if (ch2) {
-    //backward
-    if (ch2 < 0) {
-      forwardenable = 0;
-      backwardenable = 1;
-      weightBackward = 1;
-      weightForward = 0;
-    }
-    //forward
-    if (ch2 > 0) {
-      forwardenable = 1;
-      backwardenable = 0;
-      weightForward = 1;
-      weightBackward = 0;
-    }
-  }
+  
+  
   debugSerial.println();
   delay(5);
 
@@ -151,7 +119,7 @@ void loop() {
     digitalWrite(L_en1, 1);
 
     //weapon motor
-    analogWrite(motor, map(ch8, 0, 100, 0, 255));
+    analogWrite(motor, map(ch6, 0, 100, 0, 255));
     if (ch1 > 40 && (ch2 > 40 || ch2 < -40)) {
       speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //turn right fwd
@@ -181,6 +149,7 @@ void loop() {
       analogWrite(L_pmw1, speed);
     }
     if (ch1 > -20 && ch1 < 20 && ch2 > 0) {
+      speed = constrain(map(ch3, 0, 100, 0, 255), 0, 240);
       //forward
       analogWrite(R_pmw, speed);
       analogWrite(L_pmw, 0);
