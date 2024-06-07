@@ -28,11 +28,16 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) 
-    categories = models.ManyToManyField(Category, related_name='products')  # Specify a distinct related_name
-    # category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-    image_url = models.URLField(default='')
+    created_at = models.DateTimeField()
+
+    updated_at =   models.DateTimeField()
+
+    categories = models.ManyToManyField(Category, related_name='front_products')  # Specify a distinct related_name
+    #category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    image_url = models.URLField()
+
+    class Meta:
+        db_table = 'storefront_product'
     
     def __str__(self):
         return self.name

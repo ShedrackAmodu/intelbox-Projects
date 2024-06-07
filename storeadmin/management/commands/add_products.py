@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from storeadmin.models import Product
 from storefront.models import Product as StorefrontProduct 
 from django.templatetags.static import static
-
+from django.utils import timezone
 class Command(BaseCommand):
     help = 'Add products to the database and create related tables'
 
@@ -210,22 +210,44 @@ class Command(BaseCommand):
                 name, description, price, image_path, stock, supplier, category_id = product
                 image_url = static(image_path)
                 cursor.execute('''
-                    INSERT INTO storeadmin_product (name, description, price, image_url, stock, supplier, category_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ''', [name, description, price, image_url, stock, supplier, category_id])
-
+                    SELECT name FROM storeadmin_product WHERE name = %s
+                ''', [name])
+                result = cursor.fetchone()
+                if result:
+                    # Update existing product
+                    cursor.execute('''
+                        UPDATE storeadmin_product
+                        SET stock = %s, 
+                        WHERE name = %s
+                    ''', [stock, name])
+                else:
+                    # Insert new product    
+                    cursor.execute('''
+                        INSERT INTO storeadmin_product (name, description, price, image_url, stock, supplier, category_id)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ''', [name, description, price, image_url, stock, supplier, category_id])
+            for product in products:
+                name, description, price, image_path, stock, supplier, category_id = product
+                image_url = static(image_path)
+                now = timezone.now()
+                cursor.execute('''
+                    SELECT name FROM storefront_product WHERE name = %s
+                ''', [name])
+                resultp = cursor.fetchone()            
+                if resultp:
+                    # Update existing product
+                    cursor.execute('''
+                        UPDATE storefront_product
+                        SET stock = %s, updated_at = %s
+                        WHERE name = %s
+                    ''', [stock,now, name])
+                else:
+                       
+                    created_at = timezone.now()
+                    updated_at= timezone.now()
+                    cursor.execute( '''
+                               INSERT INTO storefront_product (name, description, price, stock, created_at, image_url, updated_at )
+                              VALUES (%s, %s, %s, %s, %s,%s, %s)
+                               ''', 
+                               [name, description, price,stock,  created_at,image_url , updated_at])
             self.stdout.write(self.style.SUCCESS('Tables created and populated with sample data successfully.'))
-
-
-
-@receiver(post_save, sender=Product)
-def update_storefront_product(sender, instance, **kwargs):
-    # Update corresponding entry in storefront_product
-    
-    StorefrontProduct.objects.filter(id=instance.id).update(
-        name=instance.name,
-        description=instance.description,
-        price=instance.price,
-        stock=instance.stock,
-        image_url=instance.image_url
-    )
