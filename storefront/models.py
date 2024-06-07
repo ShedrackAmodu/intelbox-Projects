@@ -9,20 +9,34 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    #TODO image_url check it 
+    #TODO image_url check it
+    
+    CATEGORY_CHOICES = [
+        ('electronics', 'Electronics'),
+        ('clothing', 'Clothing'),
+        ('home_appliances', 'Home Appliances'),
+        ('books', 'Books'),
+        ('beauty_and_health', 'Beauty and Health'),
+        ('sports_and_outdoors', 'Sports and Outdoors'),
+        ('toys_and_games', 'Toys and Games'),
+        ('furniture', 'Furniture'),
+        ('automotive', 'Automotive'),
+        ('groceries', 'Groceries'),
+        # Add more categories as needed
+    ]
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    #categories = models.ManyToManyField(Category, through='ProductCategory')
+    updated_at = models.DateTimeField(auto_now=True) 
     categories = models.ManyToManyField(Category, related_name='products')  # Specify a distinct related_name
-   
+    # category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     image_url = models.URLField(default='')
-
+    
     def __str__(self):
         return self.name
+    
 
 class ProductCategory(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-class Command(BaseCommand):
+class Command(BaseCommand): 
     help = 'Add predefined categories to the database'
 
     def handle(self, *args, **kwargs):

@@ -1,7 +1,10 @@
 from django import forms
 from .models import Product
+ 
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'category', 'image_url', 'inventory_count', 'supplier']
+        fields = ['name', 'description', 'price',  'image_url', 'stock', 'supplier','category' ]
+
+     
