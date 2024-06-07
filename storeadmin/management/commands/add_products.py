@@ -217,7 +217,7 @@ class Command(BaseCommand):
                     # Update existing product
                     cursor.execute('''
                         UPDATE storeadmin_product
-                        SET stock = %s, 
+                        SET stock = %s
                         WHERE name = %s
                     ''', [stock, name])
                 else:
