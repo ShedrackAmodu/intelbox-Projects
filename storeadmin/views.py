@@ -3,9 +3,20 @@ from .models import Product
 from .forms import ProductForm 
 from django.contrib.auth.decorators import login_required
 from storefront.models import Product as StorefrontProduct 
+from django.db.models import Q
 
 def product_list(request):
-    products = Product.objects.all()
+    query = request.GET.get('q')
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+    else:
+        products = StorefrontProduct.objects.all()
+   # products = StorefrontProduct.objects.all()  #used the storefront so it shows update time and created time 
+    # also the admin is for the owner and trustees and user end has it for the employees interface as the outside world
+    #have limited views but same app also 
     return render(request, 'storeadmin/product_list.html', {'products': products})
 
 def add_product(request):

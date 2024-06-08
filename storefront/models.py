@@ -34,8 +34,8 @@ class Product(models.Model):
 
     categories = models.ManyToManyField(Category, related_name='front_products')  # Specify a distinct related_name
     #category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-    image_url = models.URLField()
-
+    #image_url = models.URLField()
+    image_url = models.CharField(max_length=255)
     class Meta:
         db_table = 'storefront_product'
     

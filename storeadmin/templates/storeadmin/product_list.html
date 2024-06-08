@@ -6,6 +6,10 @@
 </head>
 <body>
     <h1>Admin Product List</h1>
+    <form method="GET" action="{% url 'product_list' %}">
+        <input type="text" name="q" placeholder="Search..." value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
     <table>
         <thead>
             <tr>
