@@ -30,7 +30,7 @@ class Product(models.Model):
     stock = models.IntegerField()
     created_at = models.DateTimeField()
 
-    updated_at =   models.DateTimeField()
+    updated_at =   models.DateTimeField(auto_now_add=True)
 
     categories = models.ManyToManyField(Category, related_name='front_products')  # Specify a distinct related_name
     #category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
