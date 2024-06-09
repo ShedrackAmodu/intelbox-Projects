@@ -8,7 +8,7 @@ from django.db.models import Q
 def product_list(request):
     query = request.GET.get('q')
     if query:
-        products = Product.objects.filter(
+        products = StorefrontProduct.objects.filter(
             Q(name__icontains=query) |
             Q(description__icontains=query)
         )
