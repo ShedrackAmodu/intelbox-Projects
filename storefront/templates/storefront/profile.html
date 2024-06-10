@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+</head>
+<body>
+    <h2>Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <h3>Change Password</h3>
+    <form method="post" action="{% url 'change_password' %}">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <button type="submit">Change Password</button>
+    </form>
+</body>
+</html>

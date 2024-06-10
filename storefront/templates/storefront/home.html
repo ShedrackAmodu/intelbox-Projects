@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Store - Home</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Online Store</h1>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="#">Shop</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'profile' %}">Profile</a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Categories</h2>
+            <ul>
+                {% for category in categories %}
+                    <li>{{ category.name }}</li>
+                {% endfor %}
+            </ul>
+            
+            <h2>Featured Products</h2>
+            <div class="products">
+                {% for product in products %}
+                    <div class="product">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.description }}</p>
+                        <p>${{ product.price }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Online Store. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

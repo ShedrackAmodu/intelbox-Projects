@@ -59,7 +59,9 @@ def delete_product(request, pk):
     
     return render(request, 'storeadmin/delete_product.html', {'product': product})
 
- 
+  
+
+
 
 #def admin_update_product(request, product_id):
 #    product = get_object_or_404(Product, id=product_id)
