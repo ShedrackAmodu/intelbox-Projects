@@ -247,10 +247,10 @@ class Command(BaseCommand):
                     created_at = timezone.now()
                     updated_at= timezone.now()
                     cursor.execute( '''
-                               INSERT INTO storefront_product (name, description, price, stock, created_at, image_url, updated_at )
-                              VALUES (%s, %s, %s, %s, %s,%s, %s)
+                               INSERT INTO storefront_product (name, description, price, stock, created_at, image_url, updated_at,category_id )
+                              VALUES (%s, %s, %s, %s, %s,%s, %s, %s )
                                ''', 
-                               [name, description, price,stock,  created_at,image_url , updated_at])
+                               [name, description, price,stock,  created_at,image_url , updated_at, category_id ])
             self.stdout.write(self.style.SUCCESS('Tables created and populated with sample data successfully.'))
             
             

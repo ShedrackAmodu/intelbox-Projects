@@ -16,6 +16,7 @@ class Command(BaseCommand):
             ("Furniture", "Various types of furniture for home and office."),
             ("Automotive", "Car accessories, parts, and tools."),
             ("Groceries", "Food items, beverages, and household essentials."),
+            ("Ungrouped","Items with no goups yet"),
         ]
 
         with connection.cursor() as cursor:

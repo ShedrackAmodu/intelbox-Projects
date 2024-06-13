@@ -80,7 +80,7 @@
                 <td>{{ product.stock }}</td>
                 <td>{{ product.created_at }}</td>
                 <td>{{ product.updated_at }}</td>
-                <td><img src="{% static product.image_url %}" alt="{{ product.name }}"></td>
+                <td><img src="{{ product.image_url }}" alt="{{ product.name }}"></td>
                 <td><a href="{% url 'edit_product' product.id %}">Update</a></td>
             </tr>
             {% endfor %}

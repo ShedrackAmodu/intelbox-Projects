@@ -6,20 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Store - Home</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Online Store</h1>
+            <div class="logo">
+                <img src="https://via.placeholder.com/100" alt="Store Logo">
+                <h1>Online Store</h1>
+            </div>
             <nav>
                 <ul>
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="#">Shop</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
-                    <li><a href="{% url 'profile' %}">Profile</a></li>
-                    
                 </ul>
             </nav>
         </div>
@@ -27,14 +25,23 @@
     <main>
         <div class="container">
             <h2>Categories</h2>
-            <ul>
+            <ul class="category-list">
                 {% for category in categories %}
-                    <li>{{ category.name }}</li>
+                    <li><a href="#" class="category-link" data-category-id="{{ category.id }}">{{ category.name }}</a></li>
+                {% empty %}
+                    <li>No categories available.</li>
                 {% endfor %}
             </ul>
             
             <h2>Featured Products</h2>
-            <div class="products">
+            <div class="search-form">o
+                <form id="search-form">
+                    <label for="search-input">Search:</label>
+                    <input type="text" id="search-input" name="search_query">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+            <div class="products" id="products-container">
                 {% for product in products %}
                     <div class="product">
                         <img src="{{ product.image_url }}" alt="{{ product.name }}">
@@ -42,6 +49,8 @@
                         <p>{{ product.description }}</p>
                         <p>${{ product.price }}</p>
                     </div>
+                {% empty %}
+                    <p>No products available.</p>
                 {% endfor %}
             </div>
         </div>
@@ -51,5 +60,66 @@
             <p>&copy; 2024 Online Store. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        $(document).ready(function() {
+            // Handle category click
+            $('.category-link').on('click', function(event) {
+                event.preventDefault();
+                var categoryId = $(this).data('category-id');
+                if (categoryId === undefined) {
+                    console.error("Category ID is undefined. Check if data-category-id is correctly set.");
+                    return;
+                }
+                $.ajax({
+                    url: '/storefront/category/' + categoryId + '/',
+                    method: 'GET',
+                    success: function(response) {
+                        displayProducts(response.products);
+                    },
+                    error: function(xhr) {
+                        console.log('Error:', xhr.status, xhr.statusText);
+                    }
+                });
+            });
+    
+            // Handle search form submit
+            $('#search-form').on('submit', function(event) {
+                event.preventDefault();
+                var searchQuery = $('#search-input').val();
+                $.ajax({
+                    url: '/storefront/search/',
+                    method: 'GET',
+                    data: {
+                        search_query: searchQuery
+                    },
+                    success: function(response) {
+                        displayProducts(response.products);
+                    }
+                });
+            });
+    
+            // Function to display products in the products container
+            function displayProducts(products) {
+                var productsContainer = $('#products-container');
+                productsContainer.empty();
+                if (products.length > 0) {
+                    products.forEach(function(product) {
+                        var productHtml = `
+                            <div class="product">
+                                <img src="${product.image_url}" alt="${product.name}">
+                                <h3>${product.name}</h3>
+                                <p>${product.description}</p>
+                                <p>$${product.price}</p>
+                            </div>
+                        `;
+                        productsContainer.append(productHtml);
+                    });
+                } else {
+                    productsContainer.append('<p>No products available.</p>');
+                }
+            }
+        });
+    </script>
+    
 </body>
 </html>

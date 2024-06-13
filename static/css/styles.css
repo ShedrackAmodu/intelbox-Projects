@@ -1,9 +1,10 @@
-/* static/css/styles.css */
+/* styles.css */
+
+/* Global Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 .container {
@@ -11,6 +12,7 @@ body {
     margin: 0 auto;
 }
 
+/* Header Styles */
 header {
     background-color: #333;
     color: #fff;
@@ -19,18 +21,17 @@ header {
 
 header h1 {
     margin: 0;
-    text-align: center;
+    padding: 0;
 }
 
 nav ul {
     list-style: none;
     padding: 0;
-    display: flex;
-    justify-content: center;
 }
 
 nav ul li {
-    margin: 0 15px;
+    display: inline;
+    margin-right: 20px;
 }
 
 nav ul li a {
@@ -38,17 +39,79 @@ nav ul li a {
     text-decoration: none;
 }
 
+/* Main Styles */
 main {
     padding: 20px 0;
-    text-align: center;
 }
 
+/* Footer Styles */
 footer {
     background-color: #333;
     color: #fff;
-    text-align: center;
     padding: 10px 0;
-    position: fixed;
-    bottom: 0;
+    text-align: center;
+}
+
+/* Form Styles */
+form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Table Styles */
+table {
     width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Product Styles */
+.product {
+    display: inline-block;
+    width: 200px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.product img {
+    width: 100%;
+    height: auto;
+}
+
+/* Cart Styles */
+.cart-item {
+    margin-bottom: 20px;
+}
+
+/* Checkout Styles */
+.error {
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Category Styles */
+.categories {
+    list-style: none;
+    padding: 0;
+}
+
+.categories .category {
+    display: inline-block;
+    margin-right: 10px;
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.categories .category a {
+    color: #333;
+    text-decoration: none;
 }

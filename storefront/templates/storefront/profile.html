@@ -7,8 +7,12 @@
     <h2>Profile</h2>
     <form method="post">
         {% csrf_token %}
-        {{ user_form.as_p }}
-        {{ profile_form.as_p }}
+        {% for field in user_form %}
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+            </div>
+        {% endfor %}
         <button type="submit">Save</button>
     </form>
     <h3>Change Password</h3>
@@ -18,4 +22,9 @@
         <button type="submit">Change Password</button>
     </form>
 </body>
-</html>
+</html> 
+
+
+
+
+

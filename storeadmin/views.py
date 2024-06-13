@@ -4,6 +4,7 @@ from .forms import ProductForm
 from django.contrib.auth.decorators import login_required
 from storefront.models import Product as StorefrontProduct 
 from django.db.models import Q
+import requests
 
 def product_list(request):
     query = request.GET.get('q')
@@ -61,6 +62,27 @@ def delete_product(request, pk):
 
   
 
+
+def fetch_data_from_api(request):
+    """
+    This view fetches data from an external API and renders it in a template.
+    """
+    # API endpoint to fetch data from
+    api_url = 'https://fakestoreapi.com/products'
+    
+    # Make a GET request to the API
+    response = requests.get(api_url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the JSON response
+        data = response.json()
+    else:
+        # If the request failed, set data to None
+        data = None
+
+    # Render the data in the template 'myapp/api_data.html'
+    return render(request, 'storeadmin/api_data.html', {'data': data})
 
 
 #def admin_update_product(request, product_id):

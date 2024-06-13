@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .product {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        .product img {
+            max-width: 150px;
+            display: block;
+        }
+        .product h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .product p {
+            margin: 5px 0;
+        }
+        .product .price {
+            font-weight: bold;
+            color: #c00;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Data</h1>
+    {% if data %}
+        {% for product in data %}
+        <div class="product">
+            <img src="{{ product.image }}" alt="{{ product.title }}">
+            <h2>{{ product.title }}</h2>
+            <p>{{ product.description }}</p>
+            <p class="price">${{ product.price }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No data available</p>
+    {% endif %}
+</body>
+</html>
