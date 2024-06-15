@@ -1,125 +1,154 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Store - Home</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <img src="https://via.placeholder.com/100" alt="Store Logo">
-                <h1>Online Store</h1>
+{% extends "storefront/base.html" %}
+
+{% block title %}Home - Online Store{% endblock %}
+
+{% block content %}
+<h2>Categories</h2>
+<ul class="category-list">
+    {% for category in categories %}
+         <a href="{% url 'category' category.id %}" class="category-link">{{ category.name }}</a> 
+    {% empty %}
+        <li>No categories available.</li>
+    {% endfor %}
+</ul>
+
+<h2>Featured Products</h2>
+
+<div class="search-form">
+    <form id="search-form" action="{% url 'search' %}" method="get">
+        <label for="search-input">Search:</label>
+        <input type="text" id="search-input" name="search_query">
+        <button type="submit">Search</button>
+    </form>
+</div>
+<div class="products" id="products-container">
+    {% for product in products %}
+        <div class="product" data-product-id="{{ product.id }}">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <p>${{ product.price }}</p>
+            <div class="product-quantity">
+                <button type="button" class="quantity-button minus">-</button>
+                <span class="quantity">1</span>
+                <button type="button" class="quantity-button plus">+</button>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                </ul>
-            </nav>
+            <!-- Hidden content for popup message -->
+            <div class="popup-message" style="display: none;">Good</div>
+            <form method="POST" action="{% url 'update_cart' %}" class="add-to-cart-form">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="hidden" class="quantity-input" name="quantity" value="1">
+                <button type="submit">Add to Cart</button>
+            </form>
         </div>
-    </header>
-    <main>
-        <div class="container">
-            <h2>Categories</h2>
-            <ul class="category-list">
-                {% for category in categories %}
-                    <li><a href="#" class="category-link" data-category-id="{{ category.id }}">{{ category.name }}</a></li>
-                {% empty %}
-                    <li>No categories available.</li>
-                {% endfor %}
-            </ul>
-            
-            <h2>Featured Products</h2>
-            <div class="search-form">o
-                <form id="search-form">
-                    <label for="search-input">Search:</label>
-                    <input type="text" id="search-input" name="search_query">
-                    <button type="submit">Search</button>
-                </form>
-            </div>
-            <div class="products" id="products-container">
-                {% for product in products %}
-                    <div class="product">
-                        <img src="{{ product.image_url }}" alt="{{ product.name }}">
-                        <h3>{{ product.name }}</h3>
-                        <p>{{ product.description }}</p>
-                        <p>${{ product.price }}</p>
-                    </div>
-                {% empty %}
-                    <p>No products available.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </main>
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Online Store. All rights reserved.</p>
-        </div>
-    </footer>
-    <script>
-        $(document).ready(function() {
-            // Handle category click
-            $('.category-link').on('click', function(event) {
-                event.preventDefault();
-                var categoryId = $(this).data('category-id');
-                if (categoryId === undefined) {
-                    console.error("Category ID is undefined. Check if data-category-id is correctly set.");
-                    return;
-                }
-                $.ajax({
-                    url: '/storefront/category/' + categoryId + '/',
-                    method: 'GET',
-                    success: function(response) {
-                        displayProducts(response.products);
-                    },
-                    error: function(xhr) {
-                        console.log('Error:', xhr.status, xhr.statusText);
+    {% empty %}
+        <p>No products available.</p>
+    {% endfor %}
+</div>
+
+ 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("DOM fully loaded and parsed");
+        updateCartCount();
+        // Function to handle quantity button clicks
+        function handleQuantityButtons() {
+            document.querySelectorAll('.quantity-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    const productElement = button.closest('.product');
+                    const quantityElement = productElement.querySelector('.quantity');
+                    const quantityInput = productElement.querySelector('.quantity-input');
+                    let quantity = parseInt(quantityElement.textContent);
+
+                    if (button.classList.contains('plus')) {
+                        quantity += 1;
+                    } else if (button.classList.contains('minus')) {
+                        if (quantity > 1) {
+                            quantity -= 1;
+                        }
                     }
+
+                    quantityElement.textContent = quantity;
+                    quantityInput.value = quantity;
                 });
             });
-    
-            // Handle search form submit
-            $('#search-form').on('submit', function(event) {
-                event.preventDefault();
-                var searchQuery = $('#search-input').val();
-                $.ajax({
-                    url: '/storefront/search/',
-                    method: 'GET',
-                    data: {
-                        search_query: searchQuery
-                    },
-                    success: function(response) {
-                        displayProducts(response.products);
-                    }
-                });
-            });
-    
-            // Function to display products in the products container
-            function displayProducts(products) {
-                var productsContainer = $('#products-container');
-                productsContainer.empty();
-                if (products.length > 0) {
-                    products.forEach(function(product) {
-                        var productHtml = `
-                            <div class="product">
-                                <img src="${product.image_url}" alt="${product.name}">
-                                <h3>${product.name}</h3>
-                                <p>${product.description}</p>
-                                <p>$${product.price}</p>
-                            </div>
-                        `;
-                        productsContainer.append(productHtml);
+        }
+        
+            // Script to automatically close the popup after 2 seconds
+                 // Function to handle form submission
+                 function handleFormSubmission() {
+                    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault(); // Prevent the default form submission
+                            const productElement = form.closest('.product');
+                            const popupMessage = productElement.querySelector('.popup-message');
+                            
+                            const formData = new FormData(form);
+        
+                            // Send the form data via AJAX
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                                }
+                            }).then(response => response.json())
+                            
+                              .then(data => {
+                                  if (data.message) {
+                                      // Show the popup message
+                                      popupMessage.textContent = data.message;
+                                      popupMessage.style.display = 'block';
+                                      updateCartCount();
+                                      // Hide the popup message after 2 seconds
+                                      setTimeout(() => {
+                                          popupMessage.style.display = 'none';
+                                      }, 2000);
+                                  } else {
+                                      console.error('Error:', data.error || 'Unknown error');
+                                  }
+                              }).catch(error => {
+                                  console.error('Error submitting form:', error);
+                              });
+                        });
                     });
-                } else {
-                    productsContainer.append('<p>No products available.</p>');
                 }
-            }
-        });
-    </script>
-    
-</body>
-</html>
+                
+
+                  // Function to update the cart count
+                  function updateCartCount() {
+                    fetch('{% url "get_cart_count" %}')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Received cart count:', data.cart_count);
+                            document.querySelector('.cart-count').textContent = data.cart_count;
+                        })
+                        .catch(error => console.error('Error fetching cart count:', error));
+                }
+                
+                // Initial binding of form submission and quantity buttons
+                
+                handleQuantityButtons();
+                handleFormSubmission();
+               
+        // Initial binding of form submission and quantity buttons
+      
+       
+       
+    });
+</script>
+{% endblock %}
+<!--/* function updateCartCount(){
+    fetch('{%  url "cart_count_test" %}')
+    .then(response => response.json())
+    .then(data => {
+        document.querySelector('.cart_-count').textContent
+    })
+    .catch(error => console.error('Error fetching cart count:', error))
+}*/-->

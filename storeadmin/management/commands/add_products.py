@@ -12,17 +12,60 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         with connection.cursor() as cursor:
+                      
+            
+            
+                        # Drop existing tables if they exist
+            cursor.execute('DROP TABLE IF EXISTS storefront_cartitem')
+            cursor.execute('DROP TABLE IF EXISTS storefront_cart')
+
+            # Create the storefront_cart table
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS Cart (
-                    id INTEGER PRIMARY KEY,
+                CREATE TABLE storefront_cart (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES auth_user(id)
+                )
+            ''')
+
+            # Create the storefront_cartitem table
+            cursor.execute('''
+                CREATE TABLE storefront_cartitem (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    cart_id INTEGER,
+                    product_id INTEGER,
+                    quantity INTEGER,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (cart_id) REFERENCES storefront_cart(id),
+                    FOREIGN KEY (product_id) REFERENCES storefront_product(id)
+                )
+            ''')
+            
+            # Drop the existing Cart table if it exists
+            cursor.execute('''
+                DROP TABLE IF EXISTS Cart
+            ''')
+
+            # Create the new Cart table with the correct schema
+            cursor.execute('''
+                CREATE TABLE Cart (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER,
                     product_id INTEGER,
                     quantity INTEGER,
-                    FOREIGN KEY (user_id) REFERENCES Users(id),
-                    FOREIGN KEY (product_id) REFERENCES Products(id)
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES auth_user(id),
+                    FOREIGN KEY (product_id) REFERENCES storefront_product(id)
                 )
-            ''')  
-
+            ''') 
+                 # Drop the existing Cart table if it exists
+            cursor.execute('''
+                DROP TABLE IF EXISTS Cart
+            ''')
             products = [ 
                 ('CD Player A', 'High-quality CD player with excellent sound', 49.99, '/products/cd_player_a.jpg', 15, 'Supplier A', 1),
                 ('CD Player B', 'Compact and portable CD player', 39.99, '/products/cd_player_b.jpg', 10, 'Supplier B', 1),

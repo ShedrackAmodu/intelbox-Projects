@@ -6,12 +6,37 @@ from .models import UserProfile, Order, Category, Cart, CartItem, Product
 from .forms import UserProfileForm, UserForm, PasswordChangeForm, OrderForm, OrderItem, CustomUserCreationForm
 from django.http import JsonResponse
 from django.core.mail import send_mail
-from decimal import Decimal 
 from django.template.loader import render_to_string
-from django.contrib import messages
-import logging
+from django.contrib import messages 
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt  
+#import logging
 
-logger = logging.getLogger(__name__)
+
+#logger = logging.getLogger(__name__)
+
+
+def home(request):
+    categories = Category.objects.all()
+    products = Product.objects.all()[:10]  # Get first 10 products for simplicity, adjust as needed
+    context = {
+        'categories': categories,
+        'products': products,
+    }
+    return render(request, 'storefront/home.html', context)
+
+def category_view(request, category_id):
+    categories = Category.objects.all()
+    category = get_object_or_404(Category, pk=category_id)
+    products = Product.objects.filter(category=category)
+    return render(request, 'storefront/home.html', {'categories': categories, 'products': products})
+
+def search_view(request):
+    categories = Category.objects.all()
+    search_query = request.GET.get('search_query', '')
+    products = Product.objects.filter(name__icontains=search_query)
+    return render(request, 'storefront/home.html', {'categories': categories, 'products': products})
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -31,24 +56,6 @@ def user_logout(request):
     logout(request)
     return redirect('home')
 
-def home(request):
-    categories = Category.objects.all()
-    products = Product.objects.all()[:10]  # Get first 10 products for simplicity, adjust as needed
-    context = {
-        'categories': categories,
-        'products': products,
-    }
-    return render(request, 'storefront/home.html', context)
-
-def get_products_by_category(request, category_id):
-    products = Product.objects.filter(category_id=category_id)
-    product_data = [{'name': product.name, 
-                     'description': product.description, 
-                     'price': product.price,
-                     'image_url': product.image_url} 
-                    for product in products]
-    
-    return JsonResponse({'products': product_data})
 
 def product_list(request):
     products = Product.objects.all()
@@ -68,6 +75,38 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'storefront/register.html', {'form': form})
+ 
+
+#@csrf_exempt  # If you use this, make sure to handle CSRF protection appropriately
+@require_POST
+@login_required
+def update_cart(request):
+    messages.success(request, 'Item added to cart successfully.')
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        quantity = int(request.POST.get('quantity', 1))
+        product = get_object_or_404(Product, id=product_id)
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        cart_item.quantity = quantity
+        cart_item.save()   
+        
+        return JsonResponse({'message': 'Item added to cart successfully.'})
+    
+        
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+ 
+def get_cart_count(request):
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+        if cart:
+            cart_items = CartItem.objects.filter(cart_id = cart)
+            cart_count = sum(item.quantity for item in cart_items)
+        else:
+            cart_count = 0
+
+    return JsonResponse({'cart_count': cart_count})
 
 
 @login_required
@@ -91,7 +130,6 @@ def profile(request):
         'user_form': user_form,
         'profile_form': profile_form
     })
- 
  
  
 @login_required
@@ -130,25 +168,28 @@ def create_order(request):
 def order_detail(request, order_id):
     order = Order.objects.get(id=order_id)
     return render(request, 'storefront/order_detail.html', {'order': order})
-
-@login_required
-def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    cart, created = Cart.objects.get_or_create(user=request.user, defaults={'user': request.user})
-    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-    if not created:
-        cart_item.quantity += 1
-    cart_item.save()
-    return redirect('view_cart')
-
-@login_required
-def view_cart(request):
-    cart, created = Cart.objects.get_or_create(user=request.user, defaults={'user': request.user})
-    return render(request, 'store/cart.html', {'cart': cart})
-
-
+ 
 def order_success(request):
-    return redirect('storefront/order_success')
+    return render(request, 'storefront/order_success.html' )
+
+
+@login_required
+def cart(request):
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_items = cart.cartitem_set.all()
+        total_price = cart.total_price()
+        print(f'Cart Items: {cart_items}')  # Debugging line
+        print(f'Total Price: {total_price}')  # Debugging line
+    except Cart.DoesNotExist:
+        cart_items = []
+        total_price = 0.0
+
+    return render(request, 'storefront/cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    })
+
 
 def process_payment(total_price):
     # Pseudo-code for payment processing
@@ -224,4 +265,16 @@ def checkout(request):
     cart.items.all().delete()
 
     return redirect('order_success')
-        
+
+
+#def cart_count_test(request):
+#    if request.user.is_authenticated:
+#        cart = Cart.objects.filter(user=request.user).first()
+#        if cart:
+#            cart_items = CartItem.objects.filter(cart_id = cart)
+#            cart_count = sum(item.quantity for item in cart_items)
+#        else:
+#            cart_count = 0
+#    else:
+#        cart_count = 0
+#    return JsonResponse({'cart_count': cart_count})

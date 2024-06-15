@@ -1,69 +1,20 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Shopping Cart</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <header>
-        <div class="container">
-            <h1>Online Store</h1>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'view_cart' %}">Cart</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    <main>
-        <div class="container">
-            <h2>Your Cart</h2>
-            <ul>
-                {% for item in cart.items.all %}
-                    <li>{{ item.product.name }} - {{ item.quantity }} x ${{ item.product.price }}</li>
-                {% empty %}
-                    <li>Your cart is empty.</li>
-                {% endfor %}
-            </ul>
-            <p>Total: ${{ cart.items.all|sum:"product.price" }}</p>
-        </div>
-    </main>
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Online Store. All rights reserved.</p>
-        </div>
-    </footer>
-</body>
-<script>
-    $(document).ready(function() {
-        $('.category-link').on('click', function(event) {
-            event.preventDefault();
-            var categoryId = $(this).data('category-id');
-            $.ajax({
-                url: '/category/' + categoryId + '/',
-                method: 'GET',
-                success: function(response) {
-                    var productsContainer = $('#products-container');
-                    productsContainer.empty();
-                    var products = response.products;
-                    products.forEach(function(product) {
-                        var productHtml = `
-                            <div class="product">
-                                <img src="${product.image_url}" alt="${product.name}">
-                                <h3>${product.name}</h3>
-                                <p>${product.description}</p>
-                                <p>$${product.price}</p>
-                                <a href="/add-to-cart/${product.id}/" class="add-to-cart-btn">Add to Cart</a>
-                            </div>
-                        `;
-                        productsContainer.append(productHtml);
-                    });
-                }
-            });
-        });
-    });
-</script>
+{% extends "storefront/base.html" %}
 
-</html>
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <h2>Your Cart</h2>
+        <ul>
+            {% for item in cart_items %}
+                <li>{{ item.product.name }} - {{ item.quantity }} x ${{ item.product.price }}</li>
+            {% empty %}
+                <li>Your cart is empty.</li>
+            {% endfor %}
+        </ul>
+        <p>Total: $ {{ total_price }}</p>
+    </div>
+</main>
+ 
+{% endblock %}
