@@ -10,6 +10,9 @@ from django.template.loader import render_to_string
 from django.contrib import messages 
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt  
+from .models import UserOTP
+from random import randint
+from django.core.mail import send_mail
 #import logging
 
 
@@ -66,9 +69,27 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            UserProfile.objects.get_or_create(user=user, email=user.email, phone_number=form.cleaned_data['phone_number'])
-            login(request, user)
-            return redirect('profile')
+            user_profile, created = UserProfile.objects.get_or_create(
+                user=user, 
+                email=user.email, 
+                phone_number=form.cleaned_data['phone_number']
+            )
+
+            # Generate OTP
+            otp = str(randint(100000, 999999))
+            user_profile.otp = otp
+            user_profile.save()
+
+            # Send OTP via email
+            send_mail(
+                'Your OTP Code',
+                f'Your OTP code is {otp}',
+                'onlinestorea731@hotmail.com',
+                [user.email],
+                fail_silently=False,
+            )
+
+            return redirect('verify_otp')
         else:
             print("Form is not valid")
             print(form.errors)
@@ -77,6 +98,50 @@ def register(request):
     return render(request, 'storefront/register.html', {'form': form})
  
 
+
+
+def confirm_account(request):
+    if request.method == 'POST':
+        otp = request.POST['otp']
+        try:
+            user_otp = UserOTP.objects.get(otp=otp)
+            user = user_otp.user
+            user.is_active = True
+            user.save()
+            user_otp.delete()  # Clean up OTP record
+            messages.success(request, 'Your account has been confirmed.')
+            return redirect('login')
+        except UserOTP.DoesNotExist:
+            messages.error(request, 'Invalid OTP.')
+            return redirect('confirm_account')
+
+    return render(request, 'confirm_account.html')
+
+
+@csrf_exempt 
+@login_required
+def verify_otp(request):
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        if otp:
+            try:
+                user_profile = UserProfile.objects.get(email=request.user.email)
+                
+                if user_profile.verify_otp(otp) or user_profile.verify_email_verification_code(otp):
+                    print("good13")
+                    # Handle successful OTP verification
+                    return redirect('profile')  # Replace with appropriate redirect
+                else:
+                    print("bad")
+                    messages.error(request, 'Invalid OTP. Please try again.')
+            except UserProfile.DoesNotExist:
+                print("user_profile")
+                messages.error(request, 'User profile does not exist.')
+        else:
+            messages.error(request, 'OTP not provided.')
+    
+    return render(request, 'storefront/verify_otp.html')  # Replace with your template name
+   
 #@csrf_exempt  # If you use this, make sure to handle CSRF protection appropriately
 @require_POST
 @login_required
@@ -108,6 +173,15 @@ def get_cart_count(request):
 
     return JsonResponse({'cart_count': cart_count})
 
+
+
+def remove_from_cart(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        cart = Cart.objects.get(user=request.user)
+        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+        cart_item.delete()
+    return redirect('cart')
 
 @login_required
 def profile(request):
@@ -265,6 +339,10 @@ def checkout(request):
     cart.items.all().delete()
 
     return redirect('order_success')
+
+
+
+
 
 
 #def cart_count_test(request):

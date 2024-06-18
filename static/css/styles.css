@@ -12,6 +12,12 @@ body {
     margin: 0 auto;
 }
 
+
+
+
+
+  
+
 /* Header Styles */
 header {
     background-color: #333;
@@ -158,3 +164,31 @@ table th, table td {
 .category-link:hover {
     background-color: #f0f0f0;
 }
+
+
+
+ 
+.cart-link {
+    position: relative;
+    padding-left: 90%;
+    margin-right: auto ;
+    display: inline-block;
+}
+
+.cart-icon {
+   
+    width: 8vh; /* Adjust width as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.cart-count {
+    position: absolute;
+    top: -10px; /* Adjust to position the number inside the basket */
+    right: -10px; /* Adjust to position the number inside the basket */
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+ 

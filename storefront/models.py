@@ -1,6 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid, random
+from django.utils import timezone
 
+#check this to change password, if not needed remove it 
+class UserOTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=6, blank=True, null=True)
+    token = models.UUIDField(default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.otp or self.token}"
+    
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -25,14 +37,44 @@ class Product(models.Model):
         return self.name
 
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=15, unique=True, default=0000000000)
+    email_verified = models.BooleanField(default=False)
+    email_verification_code = models.CharField(max_length=6, blank=True, null=True)
+    email_verification_code_created_at = models.DateTimeField(null=True, blank=True)
+    phone_number = models.CharField(max_length=15, unique=True)
+    otp = models.CharField(max_length=6, blank=True, null=True)  # Add this line
+
+    def generate_email_verification_code(self):
+        self.email_verification_code = str(random.randint(100000, 999999))
+        self.email_verification_code_created_at = timezone.now()
+        self.save()
+
+    def verify_email_verification_code(self, code):
+        if self.email_verification_code == code and self.email_verification_code_created_at >= timezone.now() - timezone.timedelta(minutes=5):
+            self.email_verified = True
+            self.email_verification_code =None
+            self.save()
+            return True
+        return False
+      
+    def generate_otp(self):
+        self.otp = str(random.randint(100000, 999999))
+        self.save()
+
+    def verify_otp(self, otp):
+        if self.otp == otp:
+            # Clear OTP after successful verification
+            self.otp = None
+            self.save()
+            return True
+        return False
 
     def __str__(self):
-        return self.user.username
-
+        return self.email
+       # return self.user.username old uncase error arises
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
