@@ -12,31 +12,42 @@ body {
     margin: 0 auto;
 }
 
-
-
-
-
-  
-
 /* Header Styles */
 header {
     background-color: #333;
     color: #fff;
     padding: 10px 0;
+    display: flex;
+    justify-content: space-between; /* Align items evenly across the header */
+    align-items: center; /* Center vertically */
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+}
+
+header .logo img {
+    width: 50px; /* Adjust logo width as needed */
+    height: auto;
+    margin-right: 10px;
 }
 
 header h1 {
     margin: 0;
     padding: 0;
+    font-size: 1.5rem; /* Adjust heading size as needed */
 }
 
 nav ul {
     list-style: none;
     padding: 0;
+    margin: 0;
+    display: flex; /* Change to flex display */
+    align-items: center; /* Align items vertically */
 }
 
 nav ul li {
-    display: inline;
     margin-right: 20px;
 }
 
@@ -121,6 +132,7 @@ table th, table td {
     color: #333;
     text-decoration: none;
 }
+
 .popup-message {
     display: none;
     position: fixed;
@@ -135,10 +147,11 @@ table th, table td {
     z-index: 999;
 }
 
-
+/* Category Container and Links */
 .category-container {
     display: flex;
     justify-content: center; /* Center the categories horizontally */
+    margin-top: 20px; /* Adjust margin as needed */
 }
 
 .category-list {
@@ -165,30 +178,30 @@ table th, table td {
     background-color: #f0f0f0;
 }
 
-
-
- 
+/* Cart Link Styles */
 .cart-link {
     position: relative;
-    padding-left: 90%;
-    margin-right: auto ;
-    display: inline-block;
+    display: flex; /* Ensure flex display */
+    align-items: center; /* Align items vertically */
+    margin-right: auto; /* Push to the rightmost */
+    text-decoration: none;
+    color: #fff;
+    margin-right: 10px; /* Adjust margin-right as needed */
 }
 
 .cart-icon {
-   
-    width: 8vh; /* Adjust width as needed */
-    height: auto; /* Maintain aspect ratio */
+    width: 30px; /* Adjust dimensions as needed */
+    height: auto;
+    margin-right: 5px; /* Adjust spacing between icon and text */
 }
 
 .cart-count {
-    position: absolute;
-    top: -10px; /* Adjust to position the number inside the basket */
-    right: -10px; /* Adjust to position the number inside the basket */
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 12px;
+    background-color: red; /* Adjust background color */
+    color: #fff; /* Adjust text color */
+    border-radius: 50%; /* Ensure circular shape for count */
+    padding: 2px 6px; /* Adjust padding as needed */
+    font-size: 12px; /* Adjust font size as needed */
+    position: absolute; /* Position within the cart icon */
+    top: -8px; /* Adjust vertical positioning */
+    right: -8px; /* Adjust horizontal positioning */
 }
- 

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile, Order, OrderItem
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
 
 
@@ -56,6 +56,7 @@ class OrderItemForm(forms.ModelForm):
         fields = ['product', 'quantity', 'price']
 
 class CustomUserCreationForm(UserCreationForm):
+    username = forms.CharField(max_length=150, required=True, help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.')
     first_name = forms.CharField(max_length=30, required=True, help_text='Required.')
     last_name = forms.CharField(max_length=30, required=True, help_text='Optional.')
     email = forms.EmailField(max_length=254, required=True, help_text='Required. Inform a valid email address.')
@@ -64,25 +65,28 @@ class CustomUserCreationForm(UserCreationForm):
     password2 = forms.CharField(max_length=32, required=True, help_text='Required.')
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email','phone_number', 'password1', 'password2')
+        fields = ('username','first_name', 'last_name', 'email','phone_number', 'password1', 'password2')
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.username = self.generate_unique_username(self.cleaned_data['first_name'])
+        user.username = self.cleaned_data['username']
         user.email = self.cleaned_data['email']
-        user.save()
-
-        profile, created = UserProfile.objects.get_or_create(
-            user=user,
-            phone_number=self.cleaned_data['phone_number'],
-            email=self.cleaned_data['email']
-        )
-
-        if created:
-            profile.generate_email_verification_code()  # Generate OTP on profile creation
+        if commit:
+            user.save()
+            profile, created = UserProfile.objects.get_or_create(
+                user=user,
+                phone_number=self.cleaned_data['phone_number'],
+                email=self.cleaned_data['email']
+            )
+            if created:
+                profile.generate_email_verification_code()  # Generate email verification code on profile creation
 
         return user
+        
 
+
+class CustomPasswordResetForm(PasswordResetForm):
+    email = forms.EmailField(max_length=254, required=True, help_text='Required. Provide a valid email address.')     
 #the old save without verification
 #def save(self, commit=True):
  # user = super().save(commit=False)
@@ -99,12 +103,4 @@ class CustomUserCreationForm(UserCreationForm):
 
           
  
-
-    def generate_unique_username(self, first_name):
-        base_username = first_name.lower()
-        username = base_username
-        counter = 1
-        while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
-        return username
+ 

@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Change Password</title>
+    <title>Confirm Account</title>
 </head>
 <body>
-    <h2>Change Password</h2>
+    <h2>Confirm Account</h2>
     <form method="post">
         {% csrf_token %}
-        {{ password_form.as_p }}
-        <button type="submit">Change Password</button>
+        <label for="otp">OTP:</label>
+        <input type="text" name="otp" id="otp" required><br>
+        <button type="submit">Confirm</button>
     </form>
     {% if messages %}
         <ul>

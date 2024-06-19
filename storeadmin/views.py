@@ -5,6 +5,9 @@ from django.contrib.auth.decorators import login_required
 from storefront.models import Product as StorefrontProduct 
 from django.db.models import Q
 import requests
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
+from .forms import StaffPromotionForm
 
 def product_list(request):
     query = request.GET.get('q')
@@ -20,47 +23,91 @@ def product_list(request):
     #have limited views but same app also 
     return render(request, 'storeadmin/product_list.html', {'products': products})
 
+
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST)
         if form.is_valid():
-            form.save()
+            product = form.save()
+            # Create a corresponding StorefrontProduct instance
+            StorefrontProduct.objects.create(
+                id=product.id,  # Assuming id should be the same
+                name=product.name,
+                description=product.description,
+                price=product.price,
+                stock=product.stock,
+                image_url=product.image_url
+            )
             return redirect('product_list')
     else:
         form = ProductForm()
     return render(request, 'storeadmin/add_product.html', {'form': form})
 
 def edit_product(request, pk):
-    product = Product.objects.get(pk=pk)
+    product = get_object_or_404(Product, pk=pk)
+    try:
+        storefront_product = StorefrontProduct.objects.get(pk=pk)
+    except StorefrontProduct.DoesNotExist:
+        storefront_product = None
+
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=product)
         if form.is_valid():
             form.save()
+            # Update the StorefrontProduct if it exists
+            if storefront_product:
+                storefront_product.name = product.name
+                storefront_product.description = product.description
+                storefront_product.price = product.price
+                storefront_product.stock = product.stock
+                storefront_product.image_url = product.image_url
+                storefront_product.save()
             return redirect('product_list')
     else:
         form = ProductForm(instance=product)
+    
     return render(request, 'storeadmin/edit_product.html', {'form': form})
 
+
 def delete_product(request, pk):
-    delete = False
-    try:#for   admin   data/products
-        product = Product.objects.get(pk=pk)
-        if request.method == 'POST':
+    # Fetch the product from the admin data/products
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == 'POST':
+        # Attempt to delete the product from admin data/products
+        try:
             product.delete()
-            delete = True
-    except :
-        pass
-    try:#for  front data/products
-        if delete:
-            frontproducts = StorefrontProduct.objects.get(pk=pk)
-            frontproducts.delete()
-        return redirect('product_list')
-    except :
-        pass
+            # Attempt to delete the corresponding product from the front data/products
+            try:
+                front_product = StorefrontProduct.objects.get(pk=pk)
+                front_product.delete()
+            except StorefrontProduct.DoesNotExist:
+                pass  # If the product does not exist in the front data, it's not an issue
+
+           # messages.success(request, 'Product deleted successfully.')
+            return redirect('product_list')
+        except Exception as e:
+            pass
+          #  messages.error(request, f'Error deleting product: {e}')
     
     return render(request, 'storeadmin/delete_product.html', {'product': product})
+ 
 
-  
+
+# Only allow access to superusers
+@user_passes_test(lambda u: u.is_superuser)
+def promote_to_staff(request):
+    if request.method == 'POST':
+        form = StaffPromotionForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            user.is_staff = True
+            user.save()
+            return redirect('promote_to_staff')
+    else:
+        form = StaffPromotionForm()
+    
+    return render(request, 'storeadmin/promote_to_staff.html', {'form': form})
 
 
 def fetch_data_from_api(request):
@@ -83,15 +130,4 @@ def fetch_data_from_api(request):
 
     # Render the data in the template 'myapp/api_data.html'
     return render(request, 'storeadmin/api_data.html', {'data': data})
-
-
-#def admin_update_product(request, product_id):
-#    product = get_object_or_404(Product, id=product_id)
-#    if request.method == 'POST':
-#        stock = request.POST.get('stock')
-#        if stock:
-#            product.stock = stock
-#            product.updated_at = timezone.now()
-#            product.save()
-#            return redirect('storeadmin/product_list')
-#    return render(request, 'storeadmin/edit_product.html', {'product': product})
+ 

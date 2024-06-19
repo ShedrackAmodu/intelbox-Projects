@@ -6,7 +6,7 @@
 <h2>Categories</h2>
 <ul class="category-list">
     {% for category in categories %}
-         <a href="{% url 'category' category.id %}" class="category-link">{{ category.name }}</a> 
+        <li><a href="{% url 'category' category.id %}" class="category-link">{{ category.name }}</a></li>
     {% empty %}
         <li>No categories available.</li>
     {% endfor %}
@@ -27,32 +27,38 @@
             <img src="{{ product.image_url }}" alt="{{ product.name }}">
             <h3>{{ product.name }}</h3>
             <p>{{ product.description }}</p>
-            <p>${{ product.price }}</p>
-            <div class="product-quantity">
-                <button type="button" class="quantity-button minus">-</button>
-                <span class="quantity">1</span>
-                <button type="button" class="quantity-button plus">+</button>
-            </div>
-            <!-- Hidden content for popup message -->
-            <div class="popup-message" style="display: none;">Good</div>
-            <form method="POST" action="{% url 'update_cart' %}" class="add-to-cart-form">
-                {% csrf_token %}
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <input type="hidden" class="quantity-input" name="quantity" value="1">
-                <button type="submit">Add to Cart</button>
-            </form>
+            <p>Price: ${{ product.price }}</p>
+            {% if product.stock > 0 %}
+                <p>Available: {{ product.stock }} in stock</p>
+                <div class="product-quantity">
+                    <button type="button" class="quantity-button minus">-</button>
+                    <span class="quantity">1</span>
+                    <button type="button" class="quantity-button plus">+</button>
+                </div>
+                <!-- Hidden content for popup message -->
+                <div class="popup-message" style="display: none;">Good</div>
+                <form method="POST" action="{% url 'update_cart' %}" class="add-to-cart-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="hidden" class="quantity-input" name="quantity" value="1">
+                    <button type="submit">Add to Cart</button>
+                </form>
+            {% else %}
+                <p>Out of stock</p>
+            {% endif %}
         </div>
     {% empty %}
         <p>No products available.</p>
     {% endfor %}
 </div>
 
- 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         console.log("DOM fully loaded and parsed");
         updateCartCount();
-        // Function to handle quantity button clicks
+        handleQuantityButtons();
+        handleFormSubmission();
+
         function handleQuantityButtons() {
             document.querySelectorAll('.quantity-button').forEach(button => {
                 button.addEventListener('click', function () {
@@ -74,81 +80,55 @@
                 });
             });
         }
-        
-            // Script to automatically close the popup after 2 seconds
-                 // Function to handle form submission
-                 function handleFormSubmission() {
-                    document.querySelectorAll('.add-to-cart-form').forEach(form => {
-                        form.addEventListener('submit', function (event) {
-                            event.preventDefault(); // Prevent the default form submission
-                            const productElement = form.closest('.product');
-                            const popupMessage = productElement.querySelector('.popup-message');
-                            
-                            const formData = new FormData(form);
-        
-                            // Send the form data via AJAX
-                            fetch(form.action, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                                }
-                            }).then(response => response.json())
-                            
-                              .then(data => {
-                                  if (data.message) {
-                                      // Show the popup message
-                                      popupMessage.textContent = data.message;
-                                      popupMessage.style.display = 'block';
-                                      updateCartCount();
-                                      // Hide the popup message after 2 seconds
-                                      setTimeout(() => {
-                                          popupMessage.style.display = 'none';
-                                      }, 2000);
-                                  } else {
-                                      console.error('Error:', data.error || 'Unknown error');
-                                  }
-                              }).catch(error => {
-                                  console.error('Error submitting form:', error);
-                              });
-                        });
-                    });
-                }
-                
 
-                  // Function to update the cart count
-                  function updateCartCount() {
-                    fetch('{% url "get_cart_count" %}')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Received cart count:', data.cart_count);
-                            document.querySelector('.cart-count').textContent = data.cart_count;
-                        })
-                        .catch(error => console.error('Error fetching cart count:', error));
-                }
-                
-                // Initial binding of form submission and quantity buttons
-                
-                handleQuantityButtons();
-                handleFormSubmission();
-               
-        // Initial binding of form submission and quantity buttons
-      
-       
-       
+        function handleFormSubmission() {
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const productElement = form.closest('.product');
+                    const popupMessage = productElement.querySelector('.popup-message');
+
+                    const formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        }
+                    }).then(response => response.json())
+                      .then(data => {
+                          if (data.message) {
+                              popupMessage.textContent = data.message;
+                              popupMessage.style.display = 'block';
+                              updateCartCount();
+                              setTimeout(() => {
+                                  popupMessage.style.display = 'none';
+                              }, 2000);
+                          } else {
+                              console.error('Error:', data.error || 'Unknown error');
+                          }
+                      }).catch(error => {
+                          console.error('Error submitting form:', error);
+                      });
+                });
+            });
+        }
+
+        function updateCartCount() {
+            fetch('{% url "get_cart_count" %}')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received cart count:', data.cart_count);
+                    document.querySelector('.cart-count').textContent = data.cart_count;
+                })
+                .catch(error => console.error('Error fetching cart count:', error));
+        }
     });
 </script>
 {% endblock %}
-<!--/* function updateCartCount(){
-    fetch('{%  url "cart_count_test" %}')
-    .then(response => response.json())
-    .then(data => {
-        document.querySelector('.cart_-count').textContent
-    })
-    .catch(error => console.error('Error fetching cart count:', error))
-}*/-->

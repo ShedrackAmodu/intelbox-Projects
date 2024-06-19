@@ -40,16 +40,20 @@
     <h1>Order Confirmation</h1>
     <div class="order-summary">
         <p>Thank you for your order. Here are the details:</p>
-        <p><strong>Order ID:</strong> {{ order_id }}</p>
-        <p><strong>Email:</strong> {{ user_email }}</p>
-        <p><strong>Total Price:</strong> ${{ total_price }}</p>
+        <p><strong>Order ID:</strong> 11</p>
+        <p><strong>Email:</strong> patientmanagement9@gmail.com</p>
+        <p><strong>Total Price:</strong> $89.98</p>
         <h2>Items:</h2>
         <ul class="item-list">
-            {% for item in order_items %}
+            
             <li class="item">
-                <strong>{{ item.product.name }} - Quantity:</strong> {{ item.quantity }} - <strong>Price:</strong> ${{ item.price }}
+                <strong>CD Player B - Quantity:</strong> 1 - <strong>Price:</strong> $39.99
             </li>
-            {% endfor %}
+            
+            <li class="item">
+                <strong>CD Player A - Quantity:</strong> 1 - <strong>Price:</strong> $49.99
+            </li>
+            
         </ul>
     </div>
 </body>

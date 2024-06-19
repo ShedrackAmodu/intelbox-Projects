@@ -1,0 +1,14 @@
+<!-- storeadmin/templates/storeadmin/promote_to_staff.html -->
+
+{% extends "storefront/base.html" %}
+
+{% block title %}Promote to Staff{% endblock %}
+
+{% block content %}
+<h2>Promote User to Staff</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Promote</button>
+</form>
+{% endblock %}

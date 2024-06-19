@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Online Store{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-   
 </head>
 <body>
     <header>
@@ -19,9 +18,13 @@
             <nav>
                 <ul>
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
-                    <li><a href="{% url 'profile' %}">Profile</a></li>
-                 
+                    <li>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'profile' %}">Profile</a>
+                        {% else %}
+                            <a href="{% url 'register' %}">Register</a>
+                        {% endif %}
+                    </li>
                     <li>
                         {% if user.is_authenticated %}
                             <a href="{% url 'logout' %}">Logout</a>
@@ -30,9 +33,13 @@
                         {% endif %}
                     </li>
                     <li>
-                        <a href="{% url 'cart' %}" class="cart-link">
-                            <img src="{% static 'images/cart-icon.png' %}" alt="Cart Icon" class="cart-icon">
-                            <span class="cart-count">{{ cart_count }}</span>
+                        <a  href="{% url 'cart' %}" class="cart-link">                    
+                        {% if user.is_authenticated and cart_count|default:"0" == "0" %}
+                        <img src="{% static 'images/cart-icon-filled.png' %}" alt="Cart Icon" class="cart-icon">
+                    {% else %}
+                        <img src="{% static 'images/cart-icon-empty.png' %}" alt="Cart Icon" class="cart-icon">
+                    {% endif %}                    
+                    <span class="cart-count" id="cart-count">{{ cart_count|default:"0" }}</span>
                         </a>
                     </li>
                 </ul>

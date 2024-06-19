@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm, SetPasswordForm
 from .models import UserProfile, Order, Category, Cart, CartItem, Product
-from .forms import UserProfileForm, UserForm, PasswordChangeForm, OrderForm, OrderItem, CustomUserCreationForm
+from storeadmin.models import Product as adminProduct
+from .forms import UserProfileForm, UserForm, PasswordChangeForm, OrderForm, OrderItem, CustomUserCreationForm, CustomPasswordResetForm
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -11,13 +13,15 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt  
 from .models import UserOTP
-from random import randint
-from django.core.mail import send_mail
-#import logging
-
-
-#logger = logging.getLogger(__name__)
-
+from random import randint 
+from django.contrib import messages   
+from django.contrib.auth.models import User 
+from .models import UserProfile, UserOTP 
+from uuid import uuid4
+import time
+from django.core.mail import EmailMessage 
+from django.conf import settings
+import os 
 
 def home(request):
     categories = Category.objects.all()
@@ -115,7 +119,7 @@ def confirm_account(request):
             messages.error(request, 'Invalid OTP.')
             return redirect('confirm_account')
 
-    return render(request, 'confirm_account.html')
+    return render(request, 'storefront/confirm_account.html')
 
 
 @csrf_exempt 
@@ -141,12 +145,115 @@ def verify_otp(request):
             messages.error(request, 'OTP not provided.')
     
     return render(request, 'storefront/verify_otp.html')  # Replace with your template name
-   
+
+
+
+@login_required
+def generate_otp(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile.generate_otp()
+        send_mail(
+            'Your New OTP Code',
+            f'Your new OTP code is {user_profile.otp}',
+            'your-email@example.com',  # Replace with your sender email
+            [user_profile.email],
+            fail_silently=False,
+        )
+        messages.success(request, 'A new OTP has been sent to your email.')
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'User profile does not exist.')
+
+    return redirect('verify_otp')
+
+@login_required
+def change_password(request):
+    if not request.user.userprofile.email_verified:
+        messages.error(request, 'You must verify your email before changing your password.')
+        return redirect('verify_otp')
+
+    if request.method == 'POST':
+        password_form = PasswordChangeForm(request.user, request.POST)
+        if password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        password_form = PasswordChangeForm(request.user)
+    return render(request, 'storefront/change_password.html', {'password_form': password_form})
+
+def confirm_account(request):
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            if user_profile.verify_otp(otp):
+                user_profile.email_verified = True
+                user_profile.save()
+                messages.success(request, 'Your account has been confirmed.')
+                return redirect('login')
+            else:
+                messages.error(request, 'Invalid OTP.')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'User profile does not exist.')
+
+    return render(request, 'storefront/confirm_account.html')
+
+def forgot_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                user_otp, created = UserOTP.objects.get_or_create(user=user)
+                user_otp.otp = str(randint(100000, 999999))
+                user_otp.token = uuid4()
+                user_otp.save()
+
+                # Send OTP and token via email
+                send_mail(
+                    'Reset Your Password',
+                    f'Your OTP code is {user_otp.otp}\nYour password reset token is {user_otp.token}',
+                    'your-email@example.com',  # Replace with your sender email
+                    [user.email],
+                    fail_silently=False,
+                )
+                messages.success(request, 'An email with OTP and token has been sent to reset your password.')
+                return redirect('reset_password')
+            except User.DoesNotExist:
+                messages.error(request, 'No user found with this email address.')
+    else:
+        form = CustomPasswordResetForm()
+    return render(request, 'storefront/forgot_password.html', {'form': form})
+
+def reset_password(request):
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        otp = request.POST.get('otp')
+        new_password = request.POST.get('new_password')
+        try:
+            user_otp = UserOTP.objects.get(token=token, otp=otp)
+            user = user_otp.user
+            user.set_password(new_password)
+            user.save()
+            user_otp.delete()  # Clean up OTP record
+            messages.success(request, 'Your password has been reset successfully.')
+            return redirect('login')
+        except UserOTP.DoesNotExist:
+            messages.error(request, 'Invalid token or OTP.')
+    return render(request, 'storefront/reset_password.html')
+
+
+
+
 #@csrf_exempt  # If you use this, make sure to handle CSRF protection appropriately
 @require_POST
 @login_required
 def update_cart(request):
-    messages.success(request, 'Item added to cart successfully.')
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
         quantity = int(request.POST.get('quantity', 1))
@@ -155,8 +262,15 @@ def update_cart(request):
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
         cart_item.quantity = quantity
         cart_item.save()   
+        if 'HTTP_REFERER' in request.META:
+            referer = request.META['HTTP_REFERER']
+            if 'cart' in referer:  # Check if 'cart' is in the referer URL
+                time.sleep(2)
+                return redirect('cart')  # Redirect to the cart page if request came from there
         
         return JsonResponse({'message': 'Item added to cart successfully.'})
+        
+        
     
         
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
@@ -181,6 +295,7 @@ def remove_from_cart(request):
         cart = Cart.objects.get(user=request.user)
         cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
         cart_item.delete()
+        time.sleep(2)
     return redirect('cart')
 
 @login_required
@@ -233,6 +348,14 @@ def create_order(request):
             order = form.save(commit=False)
             order.user = request.user
             order.save()
+                # Send email notification to user (plain text)
+            send_mail(
+                    'Order Confirmation',
+                    f'Thank you for your order. Your order ID is {order.id}.',
+                    'onlinestorea731@hotmail.com',
+                    [request.user.email],
+                    fail_silently=False,
+                )
             return redirect('order_detail', order_id=order.id)
     else:
         form = OrderForm()
@@ -240,8 +363,11 @@ def create_order(request):
 
 @login_required
 def order_detail(request, order_id):
-    order = Order.objects.get(id=order_id)
-    return render(request, 'storefront/order_detail.html', {'order': order})
+    order = get_object_or_404(Order,id=order_id, user=request.user)
+    order_items = OrderItem.objects.filter(order = order)
+    return render(request, 'storefront/order_detail.html', {
+        'order': order,
+        'order_items': order_items,})
  
 def order_success(request):
     return render(request, 'storefront/order_success.html' )
@@ -275,76 +401,130 @@ def process_payment(total_price):
 
 @login_required
 def checkout(request):
-    cart = get_object_or_404(Cart, user=request.user)
-    total_price = sum(item.product.price * item.quantity for item in cart.items.all())
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_items = cart.cartitem_set.all()
+        total_price = cart.total_price()
+        error_message = None
 
-    if request.method == 'POST':
-        # Check stock availability
-        for item in cart.items.all():
-            if item.product.stock < item.quantity:
-                return render(request, 'store/checkout.html', {
+        if request.method == 'POST':
+            # Check stock availability
+            insufficient_stock_items = []
+            for item in cart_items:
+                if item.product.stock < item.quantity:
+                    insufficient_stock_items.append(item.product)
+
+            if insufficient_stock_items:
+                error_message = f"Sorry, we don't have enough stock for the following items:\n"
+                for item in insufficient_stock_items:
+                    error_message += f"{item.name}: Available {item.stock} items\n"
+
+            if error_message:
+                return render(request, 'storefront/checkout.html', {
                     'cart': cart,
+                    'cart_items': cart_items,
                     'total_price': total_price,
-                    'error': f"Sorry, we don't have enough stock for {item.product.name}."
+                    'error': error_message,
                 })
 
-        # Process payment (pseudo-code, replace with actual payment integration)
-        payment_id, payment_status = process_payment(total_price)
+            # Process payment (pseudo-code, replace with actual payment integration)
+            payment_id, payment_status = process_payment(total_price)
 
-         
-    if payment_status == 'Success':
-    # Create order
-        order = Order.objects.create(
-        user=request.user,
-        total_price=total_price,
-        payment_id=payment_id,
-        payment_status=payment_status
-    )
+            if payment_status == 'Success':
+                # Create order
+                order = Order.objects.create(
+                    user=request.user,
+                    total_price=total_price,
+                    payment_id=payment_id,
+                    payment_status=payment_status
+                )
 
-    # Update product stock
-    for item in cart.items.all():
-        product = item.product
-        product.stock -= item.quantity
-        product.save()
-        # Add to order (optional: create OrderItem model)
+                # Update product stock and create OrderItem
+                for item in cart_items:
+                    product = item.product
+                    product.stock -= item.quantity
+                    AdminProduct = adminProduct.objects.get(name=product)  # Assumes adminProduct is linked to product
+                    AdminProduct.stock -= item.quantity
+                    product.save()
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        quantity=item.quantity,
+                        price=product.price
+                    )
 
-    # Send email notification to user
-    send_mail(
-        'Order Confirmation',
-        f'Thank you for your order. Your order ID is {order.id}.',
-        'your-email@example.com',
-        [request.user.email],
-        fail_silently=False,
-    )
+            
 
-    # Send email notification with order details
-    order_items = OrderItem.objects.filter(order=order)
-    order_details = {
-        'order_id': order.id,
-        'user_email': request.user.email,
+                # Send email notification with order details (plain text)
+                order_details = {
+                    'order_id': order.id,
+                    'user_email': order.user.email,
+                    'total_price': order.total_price,
+                    'order_items': OrderItem.objects.filter(order=order),
+                            }
+                email_subject = 'Order Confirmation'
+                email_body = render_to_string('storefront/order_details_email.html', order_details)
+                
+                html_file_path = os.path.join(settings.BASE_DIR, 'order_confirmation.html')
+                with open(html_file_path, 'w', encoding='utf-8') as html_file:
+                    html_file.write(email_body)
+
+                # Attach the HTML file to the email
+                email = EmailMessage(
+                    email_subject,
+                    'Please see the attached order confirmation.',
+                    'onlinestorea731@hotmail.com',  # Replace with your sender email
+                    [order.user.email],         # Send to the user's email
+                    
+                )
+                email.attach_file(html_file_path)
+
+                # Send the email
+                email.send(fail_silently=False)
+
+                 # Optionally, delete the temporary HTML file after sending the email
+                os.remove(html_file_path)
+              
+
+                # Clear cart
+                cart_items.delete()
+
+                return redirect('order_success')
+
+        return render(request, 'storefront/checkout.html', {
+            'cart': cart,
+            'cart_items': cart_items,
+            'total_price': total_price,
+        })
+
+    except Cart.DoesNotExist:
+        cart_items = []
+        total_price = 0.0
+
+    return render(request, 'storefront/checkout.html', {
+        'cart_items': cart_items,
         'total_price': total_price,
-        'order_items': order_items,
-    }
-    email_subject = 'Order Details'
-    email_body = render_to_string('email/order_details_email.html', order_details)
-    send_mail(
-        email_subject,
-        email_body,
-        'your-email@example.com',
-        [request.user.email],
-        fail_silently=False,
-    )
-
-    # Clear cart
-    cart.items.all().delete()
-
-    return redirect('order_success')
+    })
 
 
+@login_required
+def my_orders(request):
+    pending_orders = Order.objects.filter(user=request.user, status='pending')
+    delivered_orders = Order.objects.filter(user=request.user, status='delivered')
+    return render(request, 'storefront/my_orders.html', {
+        'pending_orders': pending_orders,
+        'delivered_orders': delivered_orders,
+    })
 
-
-
-
+@staff_member_required
+def update_order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in ['pending', 'delivered']:
+            order.status = new_status
+            order.save()
+    return redirect('order_detail', order_id=order.id)
 #def cart_count_test(request):
 #    if request.user.is_authenticated:
 #        cart = Cart.objects.filter(user=request.user).first()
