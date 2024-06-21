@@ -29,7 +29,8 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
                                     <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                                    <button type="submit">Update</button>
+                                    <button type="submit" style="display: none;">Update</button> <!-- Hide the button -->
+                                    <img src="{% static 'path/to/your/image.png' %}" alt="Update" class="update-image">
                                 </form>
                             </td>
                             <td>${{ item.product.price }}</td>
@@ -53,68 +54,67 @@
                 </tfoot>
             </table>
             <div class="cart-actions">
-                <a href="{% url 'checkout' %}" class="checkout-button">
-                    <img src="{% static 'images/checkout-image.png' %}" alt="Proceed to Checkout" style="border: none;">
-                </a>
+                <a href="{% url 'checkout' %}" class="checkout-button">Proceed to Checkout</a>
             </div>
         {% else %}
             <p>Your cart is empty.</p>
         {% endif %}
     </div>
     {% block extrascripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to update the cart count
-            function updateCartCount() {
-                fetch('{% url "get_cart_count" %}')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Received cart count:', data.cart_count);
-                        document.querySelector('.cart-count').textContent = data.cart_count;
-                    })
-                    .catch(error => console.error('Error fetching cart count:', error));
-            }
-            
-            function showPopupMessage(action) {
-                const popupMessage = document.querySelector('.popup-message');
-                popupMessage.textContent = `${action} successfully.`;
-                popupMessage.style.display = 'block';
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to update the cart count
+        function updateCartCount() {
+            fetch('{% url "get_cart_count" %}')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received cart count:', data.cart_count);
+                    document.querySelector('.cart-count').textContent = data.cart_count;
+                })
+                .catch(error => console.error('Error fetching cart count:', error));
+        }
+
+        function showPopupMessage(action) {
+            const popupMessage = document.querySelector('.popup-message');
+            popupMessage.textContent = `${action} successfully.`;
+            popupMessage.style.display = 'block';
+    
+            // Hide the message after 3 seconds (3000 milliseconds)
+            setTimeout(() => {
+                popupMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Call the function initially
+        updateCartCount();
         
-                // Hide the message after 3 seconds (3000 milliseconds)
-                setTimeout(() => {
-                    popupMessage.style.display = 'none';
-                }, 3000);
-            }
-            
-            // Call the function initially
-            updateCartCount();
-            
-            // Optionally, update cart count periodically (e.g., every 2 seconds)
-            setInterval(updateCartCount, 2000); // Adjust interval as needed
-            
-            // Add event listeners to update and remove forms
-            const updateForms = document.querySelectorAll('.update-cart-form');
-            updateForms.forEach(form => {
-                form.addEventListener('submit', function(event) {
-                    // Assuming you want to show the message after successful update
-                    showPopupMessage('Updated');
-                });
-            });
-            
-            const removeForms = document.querySelectorAll('.remove-cart-item-form');
-            removeForms.forEach(form => {
-                form.addEventListener('submit', function(event) {
-                    // Assuming you want to show the message after successful removal
-                    showPopupMessage('Removed');
-                });
+        // Optionally, update cart count periodically (e.g., every 2 seconds)
+        setInterval(updateCartCount, 2000); // Adjust interval as needed
+
+        // Add event listeners to update and remove forms
+        const updateForms = document.querySelectorAll('.update-cart-form');
+        updateForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent form submission
+                // Assuming you want to show the message after successful update
+                showPopupMessage('Updated');
             });
         });
-    </script>
-    {% endblock %}
+
+        const removeForms = document.querySelectorAll('.remove-cart-item-form');
+        removeForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                // Assuming you want to show the message after successful removal
+                showPopupMessage('Removed');
+            });
+        });
+    });
+</script>
+{% endblock %}
 </main>
 {% endblock %}
