@@ -1,54 +1,63 @@
 {% extends "storefront/base.html" %}
-
+{% load static%}
 {% load custom_filters %}
-{%  load static%}
-{% block title %}Your Cart{% endblock %}
 
+{% block title %}Your Cart{% endblock %}
 {% block content %}
 <main>
     <div class="container">
         <h2>Your Cart</h2>
         {% if cart_items %}
             <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <div class="popup-message" style="display: none;">Good</div>
                     {% for item in cart_items %}
                         <tr>
                             <td>
-                                <div class="cart-row">
-                                    <div><img src="{{ item.product.image_url }}" id="cart-product"></div>
-                                    <div>{{ item.product.name }}</div>
-                                </div>
+                                <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" style="width: 50px; height: auto;">
+                                {{ item.product.name }}
                             </td>
                             <td>
                                 <form method="POST" action="{% url 'update_cart' %}" class="update-cart-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <div class="update-container">
-                                        <div><input type="number" name="quantity" value="{{ item.quantity }}" min="1" id="quantity-tag"></div>
-                                        <div><input type="image" src="{% static 'images/check.png' %}" id="change-cart" alt="Submit"></div>
-                                    </div>
-                                </form>
-                                <form method="POST" action="{% url 'remove_from_cart' %}" class="remove-cart-item-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <button type="submit" class="remove-btn">
-                                        <i class="bi bi-trash"></i>
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                                    <button type="submit">
+                                        <img src="{% static 'images/update-icon.png' %}" alt="Update" style="width: 20px; height: auto;">
                                     </button>
                                 </form>
                             </td>
+                            <td>${{ item.product.price }}</td>
                             <td>${{ item.quantity|multiply:item.product.price }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'remove_from_cart' %}" class="remove-cart-item-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <button type="submit">
+                                        <img src="{% static 'images/remove-icon.png' %}" alt="Remove" style="width: 20px; height: auto;">
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2"><strong>Subtotal</strong></td>
+                        <td colspan="3">Total</td>
                         <td>${{ total_price }}</td>
+                        <td></td>
                     </tr>
                 </tfoot>
             </table>
-            
             <div class="cart-actions">
                 <a href="{% url 'checkout' %}" class="checkout-button">Proceed to Checkout</a>
             </div>
@@ -58,6 +67,7 @@
     </div>
     {% block extrascripts %}
 <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Function to update the cart count
         function updateCartCount() {
@@ -74,10 +84,9 @@
                 })
                 .catch(error => console.error('Error fetching cart count:', error));
         }
-
         function showPopupMessage(action) {
             const popupMessage = document.querySelector('.popup-message');
-            popupMessage.textContent = ${action} successfully.;
+            popupMessage.textContent = `${action} successfully.`;
             popupMessage.style.display = 'block';
     
             // Hide the message after 3 seconds (3000 milliseconds)
@@ -85,7 +94,6 @@
                 popupMessage.style.display = 'none';
             }, 3000);
         }
-
         // Call the function initially
         updateCartCount();
         
@@ -96,7 +104,7 @@
         const updateForms = document.querySelectorAll('.update-cart-form');
         updateForms.forEach(form => {
             form.addEventListener('submit', function(event) {
-                event.preventDefault(); // Prevent form submission
+               
                 // Assuming you want to show the message after successful update
                 showPopupMessage('Updated');
             });
@@ -113,4 +121,4 @@
 </script>
 {% endblock %}
 </main>
-{% endblock %}
+{% endblock %}
