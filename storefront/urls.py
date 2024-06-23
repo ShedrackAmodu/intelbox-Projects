@@ -25,7 +25,7 @@ urlpatterns = [
     path('confirm_account/', views.confirm_account, name='confirm_account'), 
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('reset-password/', views.reset_password, name='reset_password'),
- 
+    path('resend-codes/', views.resend_codes, name='resend_codes'),
     #path('cart-count',views.cart_count_test, name= 'cart_count_test') 
       
 ]

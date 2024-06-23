@@ -29,13 +29,19 @@
             {% endif %}
             <form method="post">
                 {% csrf_token %}
-                <label for="otp">OTP:</label>
-                <input type="text" id="otp" name="otp" required>
-                <br>
-                <label for="email_verification_code">Email Verification Code:</label>
-                <input type="text" id="email_verification_code" name="email_verification_code" required>
-                <br>
+                <div class="form-group">
+                    <label for="otp">OTP:</label>
+                    <input type="text" id="otp" name="otp" required>
+                </div>
+                <div class="form-group">
+                    <label for="email_verification_code">Email Verification Code:</label>
+                    <input type="text" id="email_verification_code" name="email_verification_code" required>
+                </div>
                 <button type="submit">Confirm Account</button>
+            </form>
+            <form method="post" action="{% url 'resend_codes' %}" style="margin-top: 20px;">
+                {% csrf_token %}
+                <button type="submit">Resend OTP and Email Verification Code</button>
             </form>
         </div>
     </main>

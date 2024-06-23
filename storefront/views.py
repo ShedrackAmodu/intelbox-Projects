@@ -479,3 +479,27 @@ def confirm_account(request):
             messages.error(request, 'OTP and email verification code are required.')
 
     return render(request, 'storefront/confirm_account.html')  # Replace with your template name
+
+
+
+@login_required
+def resend_codes(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile.generate_otp()
+        user_profile.generate_email_verification_code()
+
+        # Send OTP and email verification code via email
+        send_mail(
+            'Your OTP Code and Email Verification Code',
+            f'Your OTP code is {user_profile.otp}\nYour email verification code is {user_profile.email_verification_code}',
+            'onlinestorea731@hotmail.com',
+            [user_profile.email],
+            fail_silently=False,
+        )
+
+        messages.success(request, 'OTP and email verification code have been resent to your email.')
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'User profile does not exist.')
+
+    return redirect('confirm_account')
