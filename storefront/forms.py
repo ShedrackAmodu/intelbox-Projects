@@ -87,20 +87,9 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CustomPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(max_length=254, required=True, help_text='Required. Provide a valid email address.')     
-#the old save without verification
-#def save(self, commit=True):
- # user = super().save(commit=False)
- # user.username = self.generate_unique_username(self.cleaned_data['first_name'])
- # user.email = self.cleaned_data['email']
- # if commit:
- #     user.save()
- #     UserProfile.objects.get_or_create(
- #         user=user,
- #         phone_number=self.cleaned_data['phone_number'],
- #         email=self.cleaned_data['email']
- #     )
- # return user
-
-          
  
+
+
+class CheckoutForm(forms.Form):
+    delivery_address = forms.CharField(label='Delivery Address', widget=forms.Textarea)
  

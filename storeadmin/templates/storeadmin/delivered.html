@@ -1,0 +1,31 @@
+{% extends "storeadmin/base.html" %}
+
+{% block title %}Delivered Orders{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <h2>Delivered Orders</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Total Price</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in delivered_orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.total_price }}</td>
+                        <td>{{ order.created_at }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}

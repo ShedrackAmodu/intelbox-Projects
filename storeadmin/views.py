@@ -3,11 +3,37 @@ from .models import Product
 from .forms import ProductForm 
 from django.contrib.auth.decorators import login_required
 from storefront.models import Product as StorefrontProduct 
+from storefront.models import Order
 from django.db.models import Q
 import requests
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from .forms import StaffPromotionForm
+
+from django.contrib.admin.views.decorators import staff_member_required
+
+from storefront.models import  Order  # Import your Order model
+
+@staff_member_required
+def admin_user_list(request):
+    users = User.objects.all()
+    return render(request, 'storeadmin/user_list.html', {'users': users})
+
+@staff_member_required
+def admin_order_list(request):
+    pending_orders = Order.objects.exclude(status='delivered')
+    return render(request, 'storeadmin/orders.html', {'orders': pending_orders})
+
+@staff_member_required
+def admin_home(request):
+    return render(request, 'storeadmin/home.html')
+
+
+
+@staff_member_required
+def delivered_orders(request):
+    delivered_orders = Order.objects.filter(status='delivered')
+    return render(request, 'storeadmin/delivered.html', {'delivered_orders': delivered_orders})
 
 def product_list(request):
     query = request.GET.get('q')

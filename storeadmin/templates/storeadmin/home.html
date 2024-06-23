@@ -1,0 +1,16 @@
+{% extends "storeadmin/base.html" %}
+
+{% block title %}Admin Home{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <h2>Admin Dashboard</h2>
+        <ul>
+            <li><a href="{% url 'admin_user_list' %}">User List</a></li>
+            <li><a href="{% url 'admin_order_list' %}">Order List</a></li>
+            <li><a href="{% url 'delivered_orders' %}">Delivered Orders</a></li>
+        </ul>
+    </div>
+</main>
+{% endblock %}

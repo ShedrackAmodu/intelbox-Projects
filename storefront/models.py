@@ -96,6 +96,7 @@ class CartItem(models.Model):
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
         ('delivered', 'Delivered'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -105,7 +106,7 @@ class Order(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending') #choices may go
     payment_id = models.CharField(max_length=100, blank=True, null=True)
     payment_status = models.CharField(max_length=20, blank=True, null=True)
-
+    address = models.CharField(max_length=255, default='')
     def __str__(self):
         return f'Order {self.payment_id} by {self.user.username}'
 

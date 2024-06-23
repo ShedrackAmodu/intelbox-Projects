@@ -123,7 +123,6 @@ def confirm_account(request):
 
 
 @csrf_exempt 
-@login_required
 def verify_otp(request):
     if request.method == 'POST':
         otp = request.POST.get('otp')
@@ -406,8 +405,11 @@ def checkout(request):
         cart_items = cart.cartitem_set.all()
         total_price = cart.total_price()
         error_message = None
+        address = ""
 
         if request.method == 'POST':
+            address = request.POST.get('address', '')
+
             # Check stock availability
             insufficient_stock_items = []
             for item in cart_items:
@@ -425,6 +427,7 @@ def checkout(request):
                     'cart_items': cart_items,
                     'total_price': total_price,
                     'error': error_message,
+                    'address': address,
                 })
 
             # Process payment (pseudo-code, replace with actual payment integration)
@@ -436,7 +439,8 @@ def checkout(request):
                     user=request.user,
                     total_price=total_price,
                     payment_id=payment_id,
-                    payment_status=payment_status
+                    payment_status=payment_status,
+                    address=address  # Save the address
                 )
 
                 # Update product stock and create OrderItem
@@ -453,18 +457,16 @@ def checkout(request):
                         price=product.price
                     )
 
-            
-
                 # Send email notification with order details (plain text)
                 order_details = {
                     'order_id': order.id,
                     'user_email': order.user.email,
                     'total_price': order.total_price,
                     'order_items': OrderItem.objects.filter(order=order),
-                            }
+                }
                 email_subject = 'Order Confirmation'
                 email_body = render_to_string('storefront/order_details_email.html', order_details)
-                
+
                 html_file_path = os.path.join(settings.BASE_DIR, 'order_confirmation.html')
                 with open(html_file_path, 'w', encoding='utf-8') as html_file:
                     html_file.write(email_body)
@@ -474,17 +476,15 @@ def checkout(request):
                     email_subject,
                     'Please see the attached order confirmation.',
                     'onlinestorea731@hotmail.com',  # Replace with your sender email
-                    [order.user.email],         # Send to the user's email
-                    
+                    [order.user.email],  # Send to the user's email
                 )
                 email.attach_file(html_file_path)
 
                 # Send the email
                 email.send(fail_silently=False)
 
-                 # Optionally, delete the temporary HTML file after sending the email
+                # Optionally, delete the temporary HTML file after sending the email
                 os.remove(html_file_path)
-              
 
                 # Clear cart
                 cart_items.delete()
@@ -495,6 +495,7 @@ def checkout(request):
             'cart': cart,
             'cart_items': cart_items,
             'total_price': total_price,
+            'address': address,
         })
 
     except Cart.DoesNotExist:
@@ -505,8 +506,7 @@ def checkout(request):
         'cart_items': cart_items,
         'total_price': total_price,
     })
-
-
+    
 @login_required
 def my_orders(request):
     pending_orders = Order.objects.filter(user=request.user, status='pending')

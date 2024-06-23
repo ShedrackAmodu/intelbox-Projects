@@ -47,11 +47,13 @@
             <p>Total Price: ${{ total_price }}</p>
             <form method="post">
                 {% csrf_token %}
+                {{ form.as_p }}
                 <button type="submit">Pay Now</button>
             </form>
         </div>
     </main>
     <footer>
+        </form>
         <div class="container">
             <p>&copy; 2024 Online Store. All rights reserved.</p>
         </div>
