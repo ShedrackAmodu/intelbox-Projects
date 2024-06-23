@@ -27,7 +27,6 @@ class UserForm(forms.ModelForm):
         }
 
 
-
 class PasswordChangeForm(DjangoPasswordChangeForm):
     class Meta:
         fields = ['old_password', 'new_password', 'confirm_password']
@@ -89,7 +88,11 @@ class CustomPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(max_length=254, required=True, help_text='Required. Provide a valid email address.')     
  
 
+class PasswordResetForm(forms.Form):
+    token = forms.CharField(label='Token', max_length=100)
+    otp = forms.CharField(label='OTP', max_length=6)
+    new_password = forms.CharField(label='New Password', widget=forms.PasswordInput)
 
 class CheckoutForm(forms.Form):
-    delivery_address = forms.CharField(label='Delivery Address', widget=forms.Textarea)
+    delivery_address = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'placeholder': 'Enter your address'}))
  

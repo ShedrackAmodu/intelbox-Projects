@@ -22,9 +22,7 @@ urlpatterns = [
     path('search/', views.search_view, name='search'),
     path('get_cart_count/', views.get_cart_count, name='get_cart_count'),
     path('remove_from_cart/', views.remove_from_cart, name='remove_from_cart'),
-    path('confirm_account/', views.confirm_account, name='confirm_account'),
-    path('verify-otp/', views.verify_otp, name='verify_otp'), 
-    path('generate-otp/', views.generate_otp, name='generate_otp'),  
+    path('confirm_account/', views.confirm_account, name='confirm_account'), 
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('reset-password/', views.reset_password, name='reset_password'),
  

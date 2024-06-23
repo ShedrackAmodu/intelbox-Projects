@@ -22,7 +22,7 @@ def admin_user_list(request):
 @staff_member_required
 def admin_order_list(request):
     pending_orders = Order.objects.exclude(status='delivered')
-    return render(request, 'storeadmin/orders.html', {'orders': pending_orders})
+    return render(request, 'storeadmin/order_list.html', {'orders': pending_orders})
 
 @staff_member_required
 def admin_home(request):

@@ -14,6 +14,7 @@
                         {% csrf_token %}
                         <select name="status">
                             <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
                             <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
                         </select>
                         <button type="submit">Update</button>
