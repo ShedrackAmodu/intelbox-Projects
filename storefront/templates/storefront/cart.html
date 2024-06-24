@@ -1,31 +1,23 @@
 {% extends "storefront/base.html" %}
-{% load static %}
+{% load static%}
 {% load custom_filters %}
 
 {% block title %}Your Cart{% endblock %}
 {% block content %}
 <main>
+   
     <div class="container">
-        <a class="checkout-button" href="{% url 'home' %}">&#10094;</a>
+        <a  class="checkout-button" href="{% url 'home' %}">&#10094;</a>
         <h2>Your Cart</h2>
         {% if cart_items %}
             <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
                 <tbody>
                     <div class="popup-message" style="display: none;">Good</div>
                     {% for item in cart_items %}
                         <tr>
                             <td>
                                 <div class="cart-row">
-                                    <div><img src="{{ item.product.image_url }}" id="cart-product" alt="{{ item.product.name }}"></div>
+                                    <div><img src="{{ item.product.image_url }}" id="cart-product"></div>
                                     <div>{{ item.product.name }}</div>
                                 </div>
                             </td>
@@ -38,10 +30,6 @@
                                         <div><input type="image" src="{% static 'images/check.png' %}" id="change-cart" alt="Submit"></div>
                                     </div>
                                 </form>
-                            </td>
-                            <td>${{ item.product.price }}</td>
-                            <td>${{ item.quantity|multiply:item.product.price }}</td>
-                            <td>
                                 <form method="POST" action="{% url 'remove_from_cart' %}" class="remove-cart-item-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
@@ -50,17 +38,18 @@
                                     </button>
                                 </form>
                             </td>
+                            <td>${{ item.quantity|multiply:item.product.price }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3"><strong>Subtotal</strong></td>
+                        <td colspan="2"><strong>Subtotal</strong></td>
                         <td>${{ total_price }}</td>
-                        <td></td>
                     </tr>
                 </tfoot>
             </table>
+            
             <div class="cart-actions">
                 <a href="{% url 'checkout' %}" class="checkout-button">Proceed to Checkout</a>
             </div>
@@ -70,6 +59,7 @@
     </div>
     {% block extrascripts %}
 <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Function to update the cart count
         function updateCartCount() {
@@ -86,7 +76,6 @@
                 })
                 .catch(error => console.error('Error fetching cart count:', error));
         }
-
         function showPopupMessage(action) {
             const popupMessage = document.querySelector('.popup-message');
             popupMessage.textContent = `${action} successfully.`;
@@ -97,7 +86,6 @@
                 popupMessage.style.display = 'none';
             }, 3000);
         }
-
         // Call the function initially
         updateCartCount();
         
@@ -108,7 +96,7 @@
         const updateForms = document.querySelectorAll('.update-cart-form');
         updateForms.forEach(form => {
             form.addEventListener('submit', function(event) {
-                event.preventDefault(); // Prevent form submission
+               
                 // Assuming you want to show the message after successful update
                 showPopupMessage('Updated');
             });
