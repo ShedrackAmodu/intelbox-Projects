@@ -15,14 +15,19 @@
 </ul>
 
 {% if request.user.is_staff %}
+{% if form%}
 <form method="post" action="{% url 'update_order_status' order.id %}">
     {% csrf_token %}
     <label for="status">Update Status:</label>
     <select name="status" id="status">
         <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
         <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
     </select>
     <button type="submit">Update</button>
 </form>
+{% else %}
+<p>Order status cannot be updated because it is already delivered.</p>
+{% endif %}
 {% endif %}
 {% endblock %}

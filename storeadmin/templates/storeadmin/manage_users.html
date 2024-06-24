@@ -1,0 +1,41 @@
+<!-- storeadmin/templates/storeadmin/manage_users.html -->
+
+{% extends "storefront/base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<h2>Manage Users</h2>
+
+<form method="get" action="{% url 'manage_users' %}">
+    <input type="text" name="q" placeholder="Search by username" value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+<div style="display: flex; justify-content: space-between; margin-top: 20px;">
+    <div style="flex: 1; margin-right: 10px;">
+        <h3>Staff Users</h3>
+        <ul>
+            {% for user in staff %}
+            <li>{{ user.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div style="flex: 1; margin-left: 10px;">
+        <h3>Non-Staff Users</h3>
+        <ul>
+            {% for user in non_staff %}
+            <li>
+                {{ user.username }}
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <button type="submit" name="promote">{{ user.is_staff|yesno:"Demote,Promote" }}</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

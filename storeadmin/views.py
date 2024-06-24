@@ -6,13 +6,14 @@ from storefront.models import Product as StorefrontProduct
 from storefront.models import Order
 from django.db.models import Q
 import requests
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
-from .forms import StaffPromotionForm
-
+from .forms import StaffPromotionForm, PromoteToStaffForm
 from django.contrib.admin.views.decorators import staff_member_required
-
 from storefront.models import  Order  # Import your Order model
+from django.contrib.auth.models import User
+from django.contrib import messages 
+
 
 @staff_member_required
 def admin_user_list(request):
@@ -119,21 +120,35 @@ def delete_product(request, pk):
     return render(request, 'storeadmin/delete_product.html', {'product': product})
  
 
-
 # Only allow access to superusers
 @user_passes_test(lambda u: u.is_superuser)
-def promote_to_staff(request):
+def manage_users(request):
+    query = request.GET.get('q')
+    users = User.objects.all()
+
+    if query:
+        users = users.filter(username__icontains=query)
+
+    staff = users.filter(is_staff=True)
+    non_staff = users.filter(is_staff=False)
+
     if request.method == 'POST':
-        form = StaffPromotionForm(request.POST)
+        user_id = request.POST.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        form = PromoteToStaffForm(request.POST, instance=user)
         if form.is_valid():
-            user = form.cleaned_data['user']
-            user.is_staff = True
-            user.save()
-            return redirect('promote_to_staff')
+            form.save()
+            messages.success(request, f'User {user.username} role updated successfully.')
+            return redirect('manage_users')
     else:
-        form = StaffPromotionForm()
-    
-    return render(request, 'storeadmin/promote_to_staff.html', {'form': form})
+        form = PromoteToStaffForm()
+
+    return render(request, 'storeadmin/manage_users.html', {
+        'staff': staff,
+        'non_staff': non_staff,
+        'form': form,
+        'query': query,
+    })
 
 
 def fetch_data_from_api(request):

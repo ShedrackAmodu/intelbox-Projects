@@ -6,7 +6,7 @@ from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from .models import UserProfile, Order, Category, Cart, CartItem, Product
 from storeadmin.models import Product as adminProduct
 from .forms import UserProfileForm, UserForm, PasswordChangeForm, OrderForm, OrderItem, CustomUserCreationForm, CustomPasswordResetForm 
-from .forms import CheckoutForm, PasswordResetForm
+from .forms import CheckoutForm, PasswordResetForm, OrderForm
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -23,6 +23,9 @@ import time
 from django.core.mail import EmailMessage 
 from django.conf import settings
 import os 
+  
+ 
+ 
 
 def home(request):
     categories = Category.objects.all()
@@ -220,6 +223,7 @@ def remove_from_cart(request):
         time.sleep(2)
     return redirect('cart')
 
+
 @login_required
 def profile(request):
     if request.method == 'POST':
@@ -237,9 +241,13 @@ def profile(request):
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=request.user.userprofile)
 
+    # Fetch orders for the logged-in user
+    orders = Order.objects.filter(user=request.user)
+
     return render(request, 'storefront/profile.html', {
         'user_form': user_form,
-        'profile_form': profile_form
+        'profile_form': profile_form,
+        'orders': orders,
     })
  
  
@@ -283,13 +291,28 @@ def create_order(request):
         form = OrderForm()
     return render(request, 'storefront/create_order.html', {'form': form})
 
+
 @login_required
 def order_detail(request, order_id):
-    order = get_object_or_404(Order,id=order_id, user=request.user)
-    order_items = OrderItem.objects.filter(order = order)
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_items = OrderItem.objects.filter(order=order)
+    is_staff = request.user.is_staff
+    form = None
+    
+    if request.method == 'POST' and is_staff:
+        form = OrderForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Order status updated successfully.')
+            return redirect('order_detail', order_id=order_id)
+    elif order.status != 'delivered':  # Only create form if status is not delivered
+        form = OrderForm(instance=order)
     return render(request, 'storefront/order_detail.html', {
         'order': order,
-        'order_items': order_items,})
+        'order_items': order_items,
+        'form': form,  # Pass form to template for staff users
+        'is_staff': is_staff  # Pass is_staff flag to template
+    })
  
 def order_success(request):
     return render(request, 'storefront/order_success.html' )
@@ -333,9 +356,10 @@ def checkout(request):
 
         if request.method == 'POST':
             form = CheckoutForm(request.POST)
-            if form.is_valid():
-                address = form.cleaned_data.get('delivery_address')
-                
+            if form.is_valid(): 
+                delivery_address = form.cleaned_data.get('delivery_address')
+                city = form.cleaned_data.get('city')
+
                 # Check stock availability
                 insufficient_stock_items = []
                 for item in cart_items:
@@ -366,7 +390,8 @@ def checkout(request):
                         total_price=total_price,
                         payment_id=payment_id,
                         payment_status=payment_status,
-                        address=address
+                        delivery_address = delivery_address,
+                        city=city
                     )
 
                     # Update product stock and create OrderItem
@@ -421,7 +446,8 @@ def checkout(request):
                 'cart': cart,
                 'cart_items': cart_items,
                 'total_price': total_price,
-                'form': form,})
+                'form': form,
+                'error': error_message,})
 
     except Cart.DoesNotExist:
         cart_items = []
@@ -431,8 +457,6 @@ def checkout(request):
         'cart_items': cart_items,
         'total_price': total_price,
     })
-  
-    
  
     
     
@@ -450,7 +474,7 @@ def update_order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        if new_status in ['pending', 'delivered']:
+        if new_status in ['pending', 'confirmed','delivered']:
             order.status = new_status
             order.save()
     return redirect('order_detail', order_id=order.id)

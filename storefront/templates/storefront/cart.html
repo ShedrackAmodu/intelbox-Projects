@@ -1,11 +1,12 @@
 {% extends "storefront/base.html" %}
-{% load static%}
+{% load static %}
 {% load custom_filters %}
 
 {% block title %}Your Cart{% endblock %}
 {% block content %}
 <main>
     <div class="container">
+        <a class="checkout-button" href="{% url 'home' %}">&#10094;</a>
         <h2>Your Cart</h2>
         {% if cart_items %}
             <table class="cart-table">
@@ -23,17 +24,19 @@
                     {% for item in cart_items %}
                         <tr>
                             <td>
-                                <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" style="width: 50px; height: auto;">
-                                {{ item.product.name }}
+                                <div class="cart-row">
+                                    <div><img src="{{ item.product.image_url }}" id="cart-product" alt="{{ item.product.name }}"></div>
+                                    <div>{{ item.product.name }}</div>
+                                </div>
                             </td>
                             <td>
                                 <form method="POST" action="{% url 'update_cart' %}" class="update-cart-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                                    <button type="submit">
-                                        <img src="{% static 'images/update-icon.png' %}" alt="Update" style="width: 20px; height: auto;">
-                                    </button>
+                                    <div class="update-container">
+                                        <div><input type="number" name="quantity" value="{{ item.quantity }}" min="1" id="quantity-tag"></div>
+                                        <div><input type="image" src="{% static 'images/check.png' %}" id="change-cart" alt="Submit"></div>
+                                    </div>
                                 </form>
                             </td>
                             <td>${{ item.product.price }}</td>
@@ -42,8 +45,8 @@
                                 <form method="POST" action="{% url 'remove_from_cart' %}" class="remove-cart-item-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <button type="submit">
-                                        <img src="{% static 'images/remove-icon.png' %}" alt="Remove" style="width: 20px; height: auto;">
+                                    <button type="submit" class="remove-btn">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
                             </td>
@@ -52,7 +55,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3">Total</td>
+                        <td colspan="3"><strong>Subtotal</strong></td>
                         <td>${{ total_price }}</td>
                         <td></td>
                     </tr>
@@ -67,7 +70,6 @@
     </div>
     {% block extrascripts %}
 <script>
-    
     document.addEventListener('DOMContentLoaded', function() {
         // Function to update the cart count
         function updateCartCount() {
@@ -84,6 +86,7 @@
                 })
                 .catch(error => console.error('Error fetching cart count:', error));
         }
+
         function showPopupMessage(action) {
             const popupMessage = document.querySelector('.popup-message');
             popupMessage.textContent = `${action} successfully.`;
@@ -94,6 +97,7 @@
                 popupMessage.style.display = 'none';
             }, 3000);
         }
+
         // Call the function initially
         updateCartCount();
         
@@ -104,7 +108,7 @@
         const updateForms = document.querySelectorAll('.update-cart-form');
         updateForms.forEach(form => {
             form.addEventListener('submit', function(event) {
-               
+                event.preventDefault(); // Prevent form submission
                 // Assuming you want to show the message after successful update
                 showPopupMessage('Updated');
             });

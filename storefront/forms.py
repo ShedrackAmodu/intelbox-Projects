@@ -95,4 +95,4 @@ class PasswordResetForm(forms.Form):
 
 class CheckoutForm(forms.Form):
     delivery_address = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'placeholder': 'Enter your address'}))
- 
+    city = forms.CharField(max_length=100, required=True)

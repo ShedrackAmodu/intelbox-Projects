@@ -1,62 +1,60 @@
+{% extends "storefront/base.html" %}
 {% load static %}
 {% load custom_filters %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Checkout</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <header>
-        <div class="container">
-            <h1>Online Store</h1>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'cart' %}">Cart</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    <main>
-        <div class="container">
-            <h2>Checkout</h2>
-            {% if error %}
-                <p style="color: red;">{{ error }}</p>
-            {% endif %}
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart_items %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <h2>Checkout</h2>
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <div class="flex-container">
+            <div class="flex-column">
+                <form method="post">
+                    {% csrf_token %}
+                    <div>
+                        <p><strong>Delivery Details</strong></p>
+                    </div>
+                    <hr>
+                    <div>
+                        <div>
+                            <label for="delivery_address">Delivery Address:*</label>
+                            <input type="text" id="address" name="delivery_address" required>
+                        </div>
+                        <div>
+                            <label for="city">City:</label>
+                            <input type="text" id="city" name="city" required>
+                        </div>
+                        {{ form.as_p }}
+                    </div>
+                    <button type="submit">Pay Now</button>
+                </form>
+            </div>
+            <div class="flex-column">
+                <table class="cart-table">
+                    <thead>
                         <tr>
-                            <td>{{ item.product.name }}</td>
-                            <td>${{ item.product.price }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>${{ item.quantity|multiply:item.product.price }}</td>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p>Total Price: ${{ total_price }}</p>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Pay Now</button>
-            </form>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>${{ item.product.price }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ item.quantity|multiply:item.product.price }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p>Total Price: ${{ total_price }}</p>
+            </div>
         </div>
-    </main>
-    <footer>
-        </form>
-        <div class="container">
-            <p>&copy; 2024 Online Store. All rights reserved.</p>
-        </div>
-    </footer>
-</body>
-</html>
+    </div>
+</main>
+{% endblock content %}
