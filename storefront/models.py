@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid, random
-from django.utils import timezone
-
-#check this to change password, if not needed remove it 
+from django.utils import timezone 
+ 
+ 
+ 
 class UserOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     otp = models.CharField(max_length=6, blank=True, null=True)
@@ -119,3 +120,4 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.quantity} x {self.price}"
         #return f'{self.product.name} x {self.quantity}' old one working last
+

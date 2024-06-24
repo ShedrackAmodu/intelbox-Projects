@@ -56,7 +56,7 @@
     </header>
 
     <!-- Email Verification Alert -->
-    {% if user.is_authenticated and not user.profile.email_verified %}
+    {% if user.is_authenticated and not user.userprofile.email_verified %}
         <div class="alert">
             <p>Your email is not verified. <a href="{% url 'confirm_account' %}">Click here to verify your email</a>.</p>
         </div>
