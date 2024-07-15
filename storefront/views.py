@@ -357,7 +357,7 @@ def checkout(request):
         if request.method == 'POST':
             form = CheckoutForm(request.POST)
             if form.is_valid(): 
-                delivery_address = form.cleaned_data.get('delivery_address')
+                delivery_address = form.cleaned_data.get('address')
                 city = form.cleaned_data.get('city')
 
                 # Check stock availability
@@ -390,8 +390,7 @@ def checkout(request):
                         total_price=total_price,
                         payment_id=payment_id,
                         payment_status=payment_status,
-                        delivery_address = delivery_address,
-                        city=city
+                        address = delivery_address 
                     )
 
                     # Update product stock and create OrderItem
