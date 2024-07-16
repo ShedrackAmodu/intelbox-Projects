@@ -50,7 +50,7 @@
     {% else %}
         <p>No orders found.</p>
     {% endif %}
-    <a href="{% url 'my_orders'%}">Glance view</a><br><br>
+     
     <h3>Change Password</h3>
     <form method="post" action="{% url 'change_password' %}">
         {% csrf_token %}
